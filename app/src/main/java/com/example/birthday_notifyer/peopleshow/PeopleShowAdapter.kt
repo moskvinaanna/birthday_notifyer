@@ -27,6 +27,10 @@ class PeopleShowAdapter(val clickListener: PersonBirthdayListener) :
         holder.itemView.isActivated = tracker!!.isSelected(getItem(position).personId.toString())
     }
 
+    override fun getItemId(position: Int): Long {
+        return position.toLong()
+    }
+
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ViewHolder {
         return ViewHolder.from(parent)
     }
