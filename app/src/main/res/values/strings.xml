@@ -1,0 +1,22 @@
+<resources>
+    <string name="app_name">Дни рождения</string>
+    <string name="action_settings">Настройки</string>
+    <string name="person_photo">Фото</string>
+    <string name="name_label">Имя:</string>
+    <string name="name_edit">имя</string>
+    <string name="date_label">Дата рождения:</string>
+    <string name="phone_label">Номер телефона:</string>
+    <string name="save_button_text">Сохранить</string>
+    <string name="cancel_button_text">Отмена</string>
+    <string name="people_list_fragment">PeopleListFragment</string>
+    <string name="people_edit_fragment">PeopleEditFragment</string>
+    <string name="search">Поиск</string>
+    <string name="sort">Сортировать</string>
+    <string name="add">Добавить</string>
+    <string name="edit">Редактировать</string>
+    <string name="remove">Удалить</string>
+    <string name="select_all">Выбрать все</string>
+
+    <!-- TODO: Remove or change this placeholder text -->
+    <string name="hello_blank_fragment">Hello blank fragment</string>
+</resources>

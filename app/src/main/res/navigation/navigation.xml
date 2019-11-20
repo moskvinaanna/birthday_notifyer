@@ -1,0 +1,34 @@
+<?xml version="1.0" encoding="utf-8"?>
+<navigation xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/navigation"
+    app:startDestination="@id/people_list_fragment">
+    <fragment
+        android:id="@+id/people_list_fragment"
+        android:name="com.example.birthday_notifyer.peopleshow.PeopleShowFragment"
+        android:label="@string/people_list_fragment"
+        tools:layout="@layout/fragment_people_list">
+        <action
+            android:id="@+id/action_peopleListFragment_to_peopleEditFragment"
+            app:destination="@id/people_edit_fragment"
+            app:enterAnim="@anim/slide_in_right"
+            app:popEnterAnim="@anim/slide_in_right" />
+    </fragment>
+
+    <fragment
+        android:id="@+id/people_edit_fragment"
+        android:name="com.example.birthday_notifyer.peopleedit.PeopleEditFragment"
+        android:label="@string/people_edit_fragment"
+        tools:layout="@layout/fragment_person_edit">
+        <argument
+            android:name="personKey"
+            app:argType="long" />
+        <action
+            android:id="@+id/action_peopleEditFragment_to_peopleListFragment"
+            app:destination="@id/people_list_fragment"
+            app:launchSingleTop="false"
+            app:popUpTo="@+id/people_list_fragment"
+            app:popUpToInclusive="true" />
+    </fragment>
+</navigation>
