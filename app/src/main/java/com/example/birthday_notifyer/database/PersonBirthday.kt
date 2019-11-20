@@ -7,10 +7,11 @@ import androidx.room.PrimaryKey
 
 @Entity(
     tableName = "person_birthday_table"
+
 )
 data class PersonBirthday(
     @PrimaryKey(autoGenerate = true)
-    var personId: Long = 0L,
+    var personId: Long? = null,
 
     @ColumnInfo(name = "birthday_date")
     var birthdayDate: Long,

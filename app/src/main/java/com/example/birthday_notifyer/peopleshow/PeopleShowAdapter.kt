@@ -23,7 +23,7 @@ class PeopleShowAdapter(val clickListener: PersonBirthdayListener) :
         setHasStableIds(true)
     }
     override fun onBindViewHolder(holder: ViewHolder, position: Int) {
-        holder.bind(getItem(position)!!, clickListener)
+        holder.bind(position, getItem(position)!!, clickListener)
         holder.itemView.isActivated = tracker!!.isSelected(getItem(position).personId.toString())
     }
 
@@ -51,11 +51,11 @@ class PeopleShowAdapter(val clickListener: PersonBirthdayListener) :
         RecyclerView.ViewHolder(binding.root) {
         private var personItemDetail: PersonItemDetail? = null
 
-        fun bind(item: PersonBirthday, clickListener: PersonBirthdayListener) {
+        fun bind(pos: Int, item: PersonBirthday, clickListener: PersonBirthdayListener) {
             binding.person = item
             binding.clickListener = clickListener
             binding.executePendingBindings()
-            personItemDetail = PersonItemDetail(adapterPosition, item.personId.toString())
+            personItemDetail = PersonItemDetail(pos, item.personId.toString())
         }
 
         fun getPersonDetails(): PersonItemDetail{
@@ -86,5 +86,5 @@ class PersonBirthdayDiffCallback : DiffUtil.ItemCallback<PersonBirthday>() {
 
 
 class PersonBirthdayListener(val clickListener: (personId: Long) -> Unit) {
-    fun onClick(person: PersonBirthday) = clickListener(person.personId)
+    fun onClick(person: PersonBirthday) = clickListener(person.personId!!)
 }

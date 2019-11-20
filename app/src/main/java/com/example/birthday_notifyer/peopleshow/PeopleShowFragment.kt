@@ -70,20 +70,21 @@ class PeopleShowFragment: Fragment() {
             (activity as AppCompatActivity).setSupportActionBar(toolbar)
         }
         setHasOptionsMenu(true)
-        val adapter = PeopleShowAdapter(PersonBirthdayListener { personId ->
+        adapter = PeopleShowAdapter(PersonBirthdayListener { personId ->
             peopleShowViewModel.onPersonClicked(personId)
         })
-        this.adapter = adapter
-        binding.peopleList.adapter = adapter
+        //this.adapter = adapter
+        val recyclerView = binding.peopleList
+        recyclerView.adapter = adapter
         tracker = SelectionTracker.Builder(
             "selected",
-            binding.peopleList,
-            PersonItemKeyProvider(adapter),
-            PersonItemLookup(binding.peopleList),
+            recyclerView,
+            PersonItemKeyProvider(adapter!!),
+            PersonItemLookup(recyclerView),
             StorageStrategy.createStringStorage()
         ).build()
 
-        adapter.setTracker(tracker!!)
+        adapter!!.setTracker(tracker!!)
         tracker!!.addObserver(object : SelectionTracker.SelectionObserver<Any>() {
             override fun onSelectionChanged() {
                 toggleActionMode()
@@ -93,8 +94,8 @@ class PeopleShowFragment: Fragment() {
 
         peopleShowViewModel.people.observe(viewLifecycleOwner, Observer {
             it?.let {
-                adapter.submitList(it)
-                adapter.notifyDataSetChanged()
+                adapter!!.submitList(it)
+                adapter!!.notifyDataSetChanged()
             }
         })
 
