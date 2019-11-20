@@ -37,7 +37,7 @@ class PeopleEditFragment: Fragment() {
         val peopleEditViewModel =
             ViewModelProviders.of(
                 this, viewModelFactory).get(PeopleEditViewModel::class.java)
-        if (arguments.personKey != -1L){
+        if (arguments.personKey != ""){
                uiScope.launch {
                    var person: PersonBirthday = peopleEditViewModel.getPersonFromDataBase()
                    binding.nameEdit.setText(person.name)

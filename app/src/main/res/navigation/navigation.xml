@@ -23,7 +23,7 @@
         tools:layout="@layout/fragment_person_edit">
         <argument
             android:name="personKey"
-            app:argType="long" />
+            app:argType="string" />
         <action
             android:id="@+id/action_peopleEditFragment_to_peopleListFragment"
             app:destination="@id/people_list_fragment"

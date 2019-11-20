@@ -14,7 +14,7 @@ interface BirthdayDatabaseDao {
     @Update
     fun update(person: PersonBirthday)
     @Query("SELECT * from person_birthday_table WHERE personId = :key")
-    fun get(key: Long): PersonBirthday
+    fun get(key: String): PersonBirthday
     @Query("DELETE FROM person_birthday_table")
     fun clear()
     @Query("SELECT * FROM person_birthday_table ORDER BY personId DESC")

@@ -13,7 +13,7 @@ import kotlinx.coroutines.*
 import java.util.*
 
 class PeopleEditViewModel(
-    private val personKey: Long = 0L,
+    private val personKey: String = "",
     dataSource: BirthdayDatabaseDao) : ViewModel() {
     val database = dataSource
     private val viewModelJob = Job()
@@ -32,8 +32,8 @@ class PeopleEditViewModel(
 
     fun onSave(name: String, phoneNum: String, date: Long) {
         uiScope.launch {
-            if (personKey == -1L) {
-                val person = PersonBirthday(name = name, phoneNum = phoneNum, birthdayDate = date)
+            if (personKey == "") {
+                val person = PersonBirthday(UUID.randomUUID().toString(), name = name, phoneNum = phoneNum, birthdayDate = date)
                 insert(person)
             }
             else {

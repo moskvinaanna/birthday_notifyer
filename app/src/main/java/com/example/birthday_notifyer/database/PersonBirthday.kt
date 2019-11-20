@@ -10,8 +10,8 @@ import androidx.room.PrimaryKey
 
 )
 data class PersonBirthday(
-    @PrimaryKey(autoGenerate = true)
-    var personId: Long? = null,
+    @PrimaryKey
+    var personId: String,
 
     @ColumnInfo(name = "birthday_date")
     var birthdayDate: Long,

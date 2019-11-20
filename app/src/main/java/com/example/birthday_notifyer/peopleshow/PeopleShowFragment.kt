@@ -113,18 +113,6 @@ class PeopleShowFragment: Fragment() {
 
     override fun onCreateOptionsMenu(menu: Menu, inflater: MenuInflater) {
         inflater.inflate(R.menu.menu_main, menu)
-//        val item = menu.findItem(R.id.menu_search)
-//        val sv = item.actionView as SearchView
-//        sv.addOnAttachStateChangeListener(object : View.OnAttachStateChangeListener {
-//            override fun onViewAttachedToWindow(v: View) {
-//
-//            }
-//            override fun onViewDetachedFromWindow(v: View) {
-//                menu.findItem(R.id.menu_add).isVisible = true
-//                menu.findItem(R.id.menu_sort).isVisible = true
-//            }
-//        }
-//        )
         super.onCreateOptionsMenu(menu, inflater)
     }
 
@@ -142,24 +130,23 @@ class PeopleShowFragment: Fragment() {
     }
 
     private fun toggleActionMode() {
-        val selectionSize = tracker!!.getSelection().size()
-        val flag = selectionSize == 1
+        val selectionSize = tracker!!.selection.size()
         if (selectionSize > 0 && actionMode == null) {
             actionMode = (activity as AppCompatActivity).startSupportActionMode(callback)
             if (actionMode != null) {
-                val edit = actionMode!!.getMenu().findItem(R.id.menu_edit)
-                edit.setEnabled(flag)
+                val edit = actionMode!!.menu.findItem(R.id.menu_edit)
+                edit.setEnabled(selectionSize == 1)
             }
         } else if (actionMode != null) {
             if (selectionSize > 0) {
-                val edit = actionMode!!.getMenu().findItem(R.id.menu_edit)
-                edit.setEnabled(flag)
+                val edit = actionMode!!.menu.findItem(R.id.menu_edit)
+                edit.setEnabled(selectionSize == 1)
                 actionMode!!.getMenu().findItem(R.id.menu_count).setTitle(
                     String.format(
                         Locale.US,
                         "%d/%d",
                         selectionSize,
-                        adapter!!.getItemCount()
+                        adapter!!.itemCount
                     )
                 )
             } else
@@ -210,14 +197,14 @@ class PersonItemKeyProvider(private val adapter: PeopleShowAdapter) :
 
     override fun getKey(position: Int): String? {
         if (position < adapter.getAllPeople().size)
-            return adapter.getPerson(position).personId.toString()
+            return adapter.getPerson(position).personId
         return null
     }
 
     override fun getPosition(key: String): Int {
         var pos = RecyclerView.NO_POSITION
         for (i in 0 until adapter.getAllPeople().size) {
-            if (adapter.getPerson(i).personId.toString() == key)
+            if (adapter.getPerson(i).personId == key)
                 pos = i
                 break
         }
@@ -232,6 +219,7 @@ class PersonItemLookup(private val recyclerView: RecyclerView) : ItemDetailsLook
         if (view != null) {
             val viewHolder = recyclerView.getChildViewHolder(view)
             if (viewHolder is PeopleShowAdapter.ViewHolder) {
+                val name = viewHolder.getPersonDetails().selectionKey
                 return viewHolder.getPersonDetails()
             }
         }

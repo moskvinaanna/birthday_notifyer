@@ -55,7 +55,7 @@ class PeopleShowAdapter(val clickListener: PersonBirthdayListener) :
             binding.person = item
             binding.clickListener = clickListener
             binding.executePendingBindings()
-            personItemDetail = PersonItemDetail(pos, item.personId.toString())
+            personItemDetail = PersonItemDetail(pos, item.personId)
         }
 
         fun getPersonDetails(): PersonItemDetail{
@@ -85,6 +85,6 @@ class PersonBirthdayDiffCallback : DiffUtil.ItemCallback<PersonBirthday>() {
 }
 
 
-class PersonBirthdayListener(val clickListener: (personId: Long) -> Unit) {
+class PersonBirthdayListener(val clickListener: (personId: String) -> Unit) {
     fun onClick(person: PersonBirthday) = clickListener(person.personId!!)
 }
