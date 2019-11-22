@@ -6,7 +6,7 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.view.inputmethod.InputMethodManager
-import androidx.core.content.ContextCompat
+import androidx.appcompat.app.AppCompatActivity
 import androidx.databinding.DataBindingUtil
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.Observer
@@ -16,7 +16,11 @@ import com.example.birthday_notifyer.R
 import com.example.birthday_notifyer.database.BirthdayDatabase
 import com.example.birthday_notifyer.database.PersonBirthday
 import com.example.birthday_notifyer.databinding.FragmentPersonEditBinding
-import kotlinx.coroutines.*
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.Job
+import kotlinx.coroutines.launch
+
 
 class PeopleEditFragment: Fragment() {
     private val viewModelJob = Job()

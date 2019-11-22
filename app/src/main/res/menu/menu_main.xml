@@ -11,7 +11,8 @@
             android:id="@+id/menu_sort"
             android:icon="@drawable/ic_sort"
             android:title="@string/sort"
-            app:showAsAction="ifRoom" />
+            app:showAsAction="always">
+        </item>
         <item
             android:id="@+id/menu_add"
             android:icon="@drawable/ic_add"

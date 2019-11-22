@@ -15,9 +15,7 @@ class PeopleShowViewModel (
     private var viewModelJob = Job()
     private val uiScope = CoroutineScope(Dispatchers.Main + viewModelJob)
 
-    private var curPerson = MutableLiveData<PersonBirthday?>()
-
-    val people = database.getAllPeople()
+    var people = database.getAllPeople()
     private val _navigateToPeopleEdit = MutableLiveData<String>()
 
     val navigateToPeopleEdit: LiveData<String>
@@ -51,6 +49,36 @@ class PeopleShowViewModel (
         uiScope.launch {
             // Clear the database table.
             clear()
+        }
+    }
+
+    fun onSortByNameAsc(){
+        people =  database.getAllPeopleByNameAsc()
+    }
+
+    fun onSortByNameDesc(){
+        people =  database.getAllPeopleByNameDesc()
+    }
+
+    fun onSortByDateAsc(){
+        people =  database.getAllPeopleByDateAsc()
+    }
+
+    fun onSortByDateDesc(){
+        people =  database.getAllPeopleByDateDesc()
+    }
+
+//        uiScope.launch {
+//            withContext(Dispatchers.IO){
+//                database.getAllPeopleByNameDesc()
+//            }
+//        }
+
+    fun onRemove(idList: List<String>){
+        uiScope.launch{
+            withContext(Dispatchers.IO){
+                database.removePeople(idList)
+            }
         }
     }
     override fun onCleared() {

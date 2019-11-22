@@ -13,6 +13,17 @@
         android:layout_height="match_parent"
         android:orientation="vertical">
 
+        <androidx.appcompat.widget.Toolbar
+            android:id="@+id/toolbar2"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:background="?attr/colorPrimary"
+            android:minHeight="?attr/actionBarSize"
+            android:theme="?attr/actionBarTheme"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent" />
+
         <EditText
             android:id="@+id/phone_edit"
             android:layout_width="210dp"
@@ -28,18 +39,15 @@
             android:id="@+id/name_label"
             android:layout_width="37dp"
             android:layout_height="38dp"
-            android:layout_marginStart="16dp"
             android:layout_marginTop="16dp"
             android:text="@string/name_label"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toTopOf="parent" />
+            app:layout_constraintTop_toBottomOf="@+id/toolbar2" />
 
         <TextView
             android:id="@+id/date_label"
             android:layout_width="wrap_content"
             android:layout_height="38dp"
-            android:layout_marginStart="16dp"
-            android:layout_marginTop="16dp"
             android:text="@string/date_label"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toBottomOf="@+id/name_label" />
@@ -48,7 +56,6 @@
             android:id="@+id/phone_label"
             android:layout_width="wrap_content"
             android:layout_height="38dp"
-            android:layout_marginStart="16dp"
             android:layout_marginTop="16dp"
             android:text="@string/phone_label"
             app:layout_constraintStart_toStartOf="parent"
