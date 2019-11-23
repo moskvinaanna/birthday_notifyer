@@ -52,6 +52,10 @@ class PeopleShowViewModel (
         }
     }
 
+    fun onSearchPeople(name: String){
+        people = database.searchPeople("%"+name+"%")
+    }
+
     fun onSortByNameAsc(){
         people =  database.getAllPeopleByNameAsc()
     }

@@ -5,6 +5,7 @@ import android.view.*
 import androidx.appcompat.app.AppCompatActivity
 import androidx.appcompat.view.ActionMode
 import androidx.appcompat.widget.PopupMenu
+import androidx.appcompat.widget.SearchView
 import androidx.appcompat.widget.Toolbar
 import androidx.databinding.DataBindingUtil
 import androidx.fragment.app.Fragment
@@ -94,6 +95,7 @@ class PeopleShowFragment: Fragment() {
             actionMode!!.finish()
             actionMode = null
         }
+
         super.onPause()
     }
 
@@ -134,6 +136,33 @@ class PeopleShowFragment: Fragment() {
 
     override fun onCreateOptionsMenu(menu: Menu, inflater: MenuInflater) {
         inflater.inflate(R.menu.menu_main, menu)
+        val item = menu.findItem(R.id.menu_search)
+        val sv = item.actionView as SearchView
+        sv.addOnAttachStateChangeListener(object : View.OnAttachStateChangeListener {
+            override fun onViewAttachedToWindow(v: View) {}
+            override fun onViewDetachedFromWindow(v: View) {
+                menu.findItem(R.id.menu_add).isVisible = true
+                menu.findItem(R.id.menu_sort).isVisible = true
+                viewModel!!.onSortByNameAsc()
+                adapter!!.submitList(null)
+                getDataFromViewModel()
+            }
+        })
+        sv.setOnQueryTextListener(object :
+            SearchView.OnQueryTextListener {
+            override fun onQueryTextSubmit(query: String): Boolean {
+                return true
+            }
+
+            override fun onQueryTextChange(newText: String): Boolean {
+                if (newText != "") {
+                    viewModel!!.onSearchPeople(newText)
+                    adapter!!.submitList(null)
+                    getDataFromViewModel()
+                }
+                return true
+            }
+        })
         super.onCreateOptionsMenu(menu, inflater)
     }
 

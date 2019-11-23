@@ -51,4 +51,5 @@ dependencies {
     implementation 'androidx.lifecycle:lifecycle-viewmodel:2.1.0'
     implementation 'androidx.cardview:cardview:1.0.0'
     implementation 'androidx.recyclerview:recyclerview-selection:1.0.0'
+    implementation 'com.facebook.fresco:fresco:2.0.0'
 }
