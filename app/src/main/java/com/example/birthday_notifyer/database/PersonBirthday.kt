@@ -20,5 +20,8 @@ data class PersonBirthday(
     var name: String,
 
     @ColumnInfo(name = "phone_num")
-    var phoneNum: String
+    var phoneNum: String,
+
+    @ColumnInfo(name = "photo")
+    var photo: String = ""
 )

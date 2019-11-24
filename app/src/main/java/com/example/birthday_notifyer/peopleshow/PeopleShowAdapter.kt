@@ -1,8 +1,7 @@
 package com.example.birthday_notifyer.peopleshow
 
-import android.annotation.SuppressLint
+import android.net.Uri
 import android.view.LayoutInflater
-import android.view.View
 import android.view.ViewGroup
 import androidx.recyclerview.selection.SelectionTracker
 import androidx.recyclerview.widget.DiffUtil
@@ -10,11 +9,8 @@ import androidx.recyclerview.widget.ListAdapter
 import androidx.recyclerview.widget.RecyclerView
 import com.example.birthday_notifyer.database.PersonBirthday
 import com.example.birthday_notifyer.databinding.ListItemPersonBinding
-import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.launch
-import kotlinx.coroutines.withContext
-import java.lang.ClassCastException
+import com.facebook.drawee.view.SimpleDraweeView
+import java.io.File
 
 class PeopleShowAdapter(val clickListener: PersonBirthdayListener) :
     ListAdapter<PersonBirthday, PeopleShowAdapter.ViewHolder>(PersonBirthdayDiffCallback()) {
@@ -56,7 +52,12 @@ class PeopleShowAdapter(val clickListener: PersonBirthdayListener) :
         private var personItemDetail: PersonItemDetail? = null
 
         fun bind(pos: Int, item: PersonBirthday, clickListener: PersonBirthdayListener) {
+            val photoView: SimpleDraweeView = binding.photo
             binding.person = item
+            if (item.photo != "")
+                photoView.setImageURI(Uri.fromFile(File(item.photo)), null)
+            else
+                photoView.setImageURI(Uri.EMPTY, null)
             binding.clickListener = clickListener
             binding.executePendingBindings()
             personItemDetail = PersonItemDetail(pos, item.personId)

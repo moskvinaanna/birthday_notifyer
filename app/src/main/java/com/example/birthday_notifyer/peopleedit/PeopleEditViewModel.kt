@@ -30,14 +30,14 @@ class PeopleEditViewModel(
         _navigateToPeopleShow.value = null
     }
 
-    fun onSave(name: String, phoneNum: String, date: Long) {
+    fun onSave(id: String, name: String, phoneNum: String, date: Long, photo: String) {
         uiScope.launch {
             if (personKey == "") {
-                val person = PersonBirthday(UUID.randomUUID().toString(), name = name, phoneNum = phoneNum, birthdayDate = date)
+                val person = PersonBirthday(id, name = name, phoneNum = phoneNum, birthdayDate = date, photo = photo)
                 insert(person)
             }
             else {
-                update(name, phoneNum, date)
+                update(name, phoneNum, date, photo)
             }
         }
         _navigateToPeopleShow.value = true
@@ -53,12 +53,13 @@ class PeopleEditViewModel(
             database.insert(person)
         }
     }
-    private suspend fun update(name: String, phoneNum: String, date: Long) {
+    private suspend fun update(name: String, phoneNum: String, date: Long, photo: String) {
         withContext(Dispatchers.IO) {
             val person = database.get(personKey)
             person.name = name
             person.phoneNum = phoneNum
             person.birthdayDate = date
+            person.photo = photo
             database.update(person)
         }
     }
