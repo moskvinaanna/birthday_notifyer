@@ -1,7 +1,10 @@
 package com.example.birthday_notifyer.peopleshow
 
+import android.content.Context
+import android.opengl.Visibility
 import android.os.Bundle
 import android.view.*
+import android.view.inputmethod.InputMethodManager
 import androidx.appcompat.app.AppCompatActivity
 import androidx.appcompat.view.ActionMode
 import androidx.appcompat.widget.PopupMenu
@@ -21,6 +24,7 @@ import androidx.recyclerview.widget.RecyclerView
 import com.example.birthday_notifyer.R
 import com.example.birthday_notifyer.database.BirthdayDatabase
 import com.example.birthday_notifyer.databinding.FragmentPeopleListBinding
+import java.io.File
 import java.util.*
 
 class PeopleShowFragment: Fragment() {
@@ -95,7 +99,6 @@ class PeopleShowFragment: Fragment() {
             actionMode!!.finish()
             actionMode = null
         }
-
         super.onPause()
     }
 
@@ -146,6 +149,8 @@ class PeopleShowFragment: Fragment() {
                 viewModel!!.onSortByNameAsc()
                 adapter!!.submitList(null)
                 getDataFromViewModel()
+                val inputMethodManager = context?.getSystemService(Context.INPUT_METHOD_SERVICE) as InputMethodManager
+                inputMethodManager.hideSoftInputFromWindow(sv.windowToken, 0)
             }
         })
         sv.setOnQueryTextListener(object :
@@ -155,7 +160,7 @@ class PeopleShowFragment: Fragment() {
             }
 
             override fun onQueryTextChange(newText: String): Boolean {
-                if (newText != "") {
+                if (view != null) {
                     viewModel!!.onSearchPeople(newText)
                     adapter!!.submitList(null)
                     getDataFromViewModel()
@@ -171,6 +176,8 @@ class PeopleShowFragment: Fragment() {
         when (item.itemId) {
             R.id.menu_add -> viewModel?.onAdd()
             R.id.menu_search -> {
+                menu.findItem(R.id.menu_add).isVisible = false
+                menu.findItem(R.id.menu_sort).isVisible = false
             }
             R.id.menu_sort ->{
                 if (activity is AppCompatActivity){
@@ -253,8 +260,13 @@ class PeopleShowFragment: Fragment() {
                 R.id.menu_remove -> {
                     val ids = ArrayList<String>()
                     for (person in adapter!!.getAllPeople()) {
-                        if (tracker!!.selection.contains(person.personId))
+                        if (tracker!!.selection.contains(person.personId)) {
                             ids.add(person.personId)
+                            if (person.photo != "") {
+                                val photo = File(person.photo)
+                                photo.delete()
+                            }
+                        }
                     }
                     viewModel!!.onRemove(ids)
                     adapter!!.submitList(null)

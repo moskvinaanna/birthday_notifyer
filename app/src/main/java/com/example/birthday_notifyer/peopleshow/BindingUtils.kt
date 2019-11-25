@@ -19,9 +19,13 @@ fun TextView.setPersonName(item: PersonBirthday?) {
 @BindingAdapter("dateString")
 fun TextView.setBirthdayDate(item: PersonBirthday?) {
     item?.let {
-        val date = Date(item.birthdayDate)
-        val format = SimpleDateFormat("yyyy.MM.dd HH:mm")
-        text = format.format(date)
+        if (item.birthdayDate != null) {
+            val date = Date(item.birthdayDate!!)
+            val format = SimpleDateFormat("dd.MM.yyyy")
+            text = format.format(date)
+        }
+        else
+            text = ""
     }
 }
 

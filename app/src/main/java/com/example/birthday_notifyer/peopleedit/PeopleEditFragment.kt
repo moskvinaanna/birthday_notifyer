@@ -1,15 +1,19 @@
 package com.example.birthday_notifyer.peopleedit
 
 import android.app.Activity
+import android.app.DatePickerDialog
 import android.content.Context
 import android.content.DialogInterface
 import android.content.Intent
 import android.net.Uri
 import android.os.Bundle
+import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.view.inputmethod.InputMethodManager
+import android.widget.DatePicker
+import android.widget.TextView
 import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.content.ContextCompat.getExternalFilesDirs
@@ -32,6 +36,7 @@ import java.io.File
 import java.io.FileOutputStream
 import java.io.InputStream
 import java.io.OutputStream
+import java.text.SimpleDateFormat
 import java.util.*
 
 
@@ -40,6 +45,8 @@ class PeopleEditFragment: Fragment() {
     private val uiScope = CoroutineScope(Dispatchers.Main + viewModelJob)
     private var photoUri: Uri? = null
     private var photo: SimpleDraweeView? = null
+    private var dateTextView: TextView? = null
+    private var cal = Calendar.getInstance()
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?,
                               savedInstanceState: Bundle?): View? {
@@ -64,7 +71,11 @@ class PeopleEditFragment: Fragment() {
                    person = peopleEditViewModel.getPersonFromDataBase()
                    binding.nameEdit.setText(person!!.name)
                    binding.phoneEdit.setText(person!!.phoneNum)
-                   binding.dateEdit.setText(person!!.birthdayDate.toString())
+                   if (person!!.birthdayDate != null) {
+                       val date = Date(person!!.birthdayDate!!)
+                       val format = SimpleDateFormat("dd.MM.yyyy")
+                       binding.dateEdit.setText(format.format(date))
+                   }
                    if (person!!.photo != ""){
                        photoUri = Uri.fromFile(File(person!!.photo))
                        photo!!.setImageURI(photoUri, null)
@@ -130,11 +141,21 @@ class PeopleEditFragment: Fragment() {
                 val file = File(p)
                 if (file.exists()) file.delete()
             }
-            peopleEditViewModel.onSave(personId, binding.nameEdit.text.toString(),
-                binding.phoneEdit.text.toString(), System.currentTimeMillis(), filePath
+            if (dateTextView!!.text.toString() == "") {
+                peopleEditViewModel.onSave(
+                    personId, binding.nameEdit.text.toString(),
+                    binding.phoneEdit.text.toString(), null, filePath
 
-            )
+                )
+            }
+            else{
+                peopleEditViewModel.onSave(
+                    personId, binding.nameEdit.text.toString(),
+                    binding.phoneEdit.text.toString(), cal.timeInMillis, filePath
 
+                )
+
+            }
             val inputMethodManager = this.context?.getSystemService(Context.INPUT_METHOD_SERVICE) as InputMethodManager
             inputMethodManager.hideSoftInputFromWindow(binding.phoneEdit.windowToken, 0)
         }
@@ -147,8 +168,36 @@ class PeopleEditFragment: Fragment() {
                 peopleEditViewModel.doneNavigating()
             }
         })
+        val dateSetListener = object : DatePickerDialog.OnDateSetListener {
+            override fun onDateSet(view: DatePicker, year: Int, monthOfYear: Int,
+                                   dayOfMonth: Int) {
+                cal.set(Calendar.YEAR, year)
+                cal.set(Calendar.MONTH, monthOfYear)
+                cal.set(Calendar.DAY_OF_MONTH, dayOfMonth)
+                updateDateInView()
+            }
+        }
+        dateTextView = binding.dateEdit
 
+        // when you click on the button, show DatePickerDialog that is set with OnDateSetListener
+        dateTextView!!.setOnClickListener(object : View.OnClickListener {
+            override fun onClick(view: View) {
+                DatePickerDialog(activity as AppCompatActivity,
+                    dateSetListener,
+                    // set DatePickerDialog to point to today's date when it loads up
+                    cal.get(Calendar.YEAR),
+                    cal.get(Calendar.MONTH),
+                    cal.get(Calendar.DAY_OF_MONTH)).show()
+            }
+
+        })
         return binding.root
+    }
+
+    private fun updateDateInView() {
+        val myFormat = "dd.MM.yyyy" // mention the format you need
+        val sdf = SimpleDateFormat(myFormat, Locale.US)
+        dateTextView!!.text = sdf.format(cal.getTime())
     }
 
     override fun onActivityResult(

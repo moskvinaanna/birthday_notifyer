@@ -14,7 +14,7 @@ data class PersonBirthday(
     var personId: String,
 
     @ColumnInfo(name = "birthday_date")
-    var birthdayDate: Long,
+    var birthdayDate: Long?,
 
     @ColumnInfo(name = "name")
     var name: String,
