@@ -1,8 +1,10 @@
 package com.example.birthday_notifyer.peopleshow
 
+import android.Manifest
 import android.content.Context
-import android.opengl.Visibility
+import android.content.pm.PackageManager
 import android.os.Bundle
+import android.provider.ContactsContract
 import android.view.*
 import android.view.inputmethod.InputMethodManager
 import androidx.appcompat.app.AppCompatActivity
@@ -10,6 +12,8 @@ import androidx.appcompat.view.ActionMode
 import androidx.appcompat.widget.PopupMenu
 import androidx.appcompat.widget.SearchView
 import androidx.appcompat.widget.Toolbar
+import androidx.core.app.ActivityCompat
+import androidx.core.content.ContextCompat
 import androidx.databinding.DataBindingUtil
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.Observer
@@ -23,7 +27,9 @@ import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.example.birthday_notifyer.R
 import com.example.birthday_notifyer.database.BirthdayDatabase
+import com.example.birthday_notifyer.database.PersonBirthday
 import com.example.birthday_notifyer.databinding.FragmentPeopleListBinding
+import com.google.android.material.snackbar.Snackbar
 import java.io.File
 import java.util.*
 
@@ -34,6 +40,7 @@ class PeopleShowFragment: Fragment() {
     private var adapter: PeopleShowAdapter? = null
     private var actionMode: ActionMode? = null
     private var popupMenu: PopupMenu? = null
+
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?,
                               savedInstanceState: Bundle?): View? {
@@ -92,6 +99,27 @@ class PeopleShowFragment: Fragment() {
                 }
             })
         return binding.root
+    }
+
+    private fun getContactList(): List<PersonBirthday>{
+        val cur = context!!.contentResolver
+            .query(
+                ContactsContract.CommonDataKinds.Phone.CONTENT_URI,
+                null,
+                null,
+                null,
+                null
+            )
+        var peopleList: MutableList<PersonBirthday> = mutableListOf()
+        while (cur != null && cur.moveToNext()) {
+            var person = PersonBirthday(personId = UUID.randomUUID().toString(),
+                name = cur.getString(cur.getColumnIndex(ContactsContract.CommonDataKinds.Phone.DISPLAY_NAME)),
+                phoneNum = cur.getString(cur.getColumnIndex(ContactsContract.CommonDataKinds.Phone.NUMBER)),
+                birthdayDate = null)
+            peopleList.add(person)
+        }
+        cur!!.close()
+        return peopleList
     }
 
     override fun onPause() {
@@ -174,7 +202,19 @@ class PeopleShowFragment: Fragment() {
     override fun onOptionsItemSelected(item: MenuItem): Boolean {
         val menu = toolbar!!.menu
         when (item.itemId) {
-            R.id.menu_add -> viewModel?.onAdd()
+            R.id.menu_add -> {
+                if(ContextCompat.checkSelfPermission(activity as AppCompatActivity,
+                        Manifest.permission.READ_CONTACTS)  != PackageManager.PERMISSION_GRANTED) {
+                    ActivityCompat.requestPermissions(
+                        activity as AppCompatActivity, arrayOf(Manifest.permission.READ_CONTACTS),
+                        1)
+                    //Snackbar.make(, "Нет доступа", Snackbar.LENGTH_SHORT).show()
+                    return true
+                }
+                val list: List<PersonBirthday> = getContactList()
+                viewModel!!.addPeople(list)
+            }
+               // viewModel?.onAdd() }
             R.id.menu_search -> {
                 menu.findItem(R.id.menu_add).isVisible = false
                 menu.findItem(R.id.menu_sort).isVisible = false

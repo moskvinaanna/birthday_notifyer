@@ -13,6 +13,7 @@ import com.example.birthday_notifyer.databinding.FragmentPeopleListBinding
 import com.facebook.drawee.backends.pipeline.Fresco
 
 import kotlinx.android.synthetic.main.activity_main.*
+import android.provider.ContactsContract
 
 class MainActivity : AppCompatActivity() {
 

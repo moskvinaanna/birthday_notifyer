@@ -45,6 +45,14 @@ class PeopleShowViewModel (
         }
     }
 
+    fun addPeople(people: List<PersonBirthday>){
+        uiScope.launch {
+            for (person in people) {
+                insert(person)
+            }
+        }
+    }
+
     fun onClear() {
         uiScope.launch {
             // Clear the database table.
