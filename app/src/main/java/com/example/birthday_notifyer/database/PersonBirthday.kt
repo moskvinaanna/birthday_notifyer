@@ -6,7 +6,8 @@ import androidx.room.Index
 import androidx.room.PrimaryKey
 
 @Entity(
-    tableName = "person_birthday_table"
+    tableName = "person_birthday_table",
+    indices = arrayOf(Index(value = ["phone_num"], unique = true))
 
 )
 data class PersonBirthday(

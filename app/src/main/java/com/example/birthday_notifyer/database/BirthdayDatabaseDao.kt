@@ -1,15 +1,12 @@
 package com.example.birthday_notifyer.database
 
 import androidx.lifecycle.LiveData
-import androidx.room.Dao
-import androidx.room.Insert
-import androidx.room.Query
-import androidx.room.Update
+import androidx.room.*
 
 @Dao
 interface BirthdayDatabaseDao {
 
-    @Insert
+    @Insert(onConflict = OnConflictStrategy.IGNORE)
     fun insert(person: PersonBirthday)
     @Update
     fun update(person: PersonBirthday)
@@ -21,14 +18,14 @@ interface BirthdayDatabaseDao {
     fun clear()
     @Query("SELECT * FROM person_birthday_table ORDER BY personId DESC")
     fun getAllPeople(): LiveData<List<PersonBirthday>>
-    @Query("SELECT * FROM person_birthday_table ORDER BY name ASC")
-    fun getAllPeopleByNameAsc(): LiveData<List<PersonBirthday>>
-    @Query("SELECT * FROM person_birthday_table ORDER BY name DESC")
-    fun getAllPeopleByNameDesc(): LiveData<List<PersonBirthday>>
-    @Query("SELECT * FROM person_birthday_table ORDER BY birthday_date ASC")
-    fun getAllPeopleByDateAsc(): LiveData<List<PersonBirthday>>
-    @Query("SELECT * FROM person_birthday_table ORDER BY birthday_date DESC")
-    fun getAllPeopleByDateDesc(): LiveData<List<PersonBirthday>>
+    @Query("SELECT * FROM person_birthday_table WHERE name LIKE :name ORDER BY name ASC")
+    fun getAllPeopleByNameAsc(name: String): LiveData<List<PersonBirthday>>
+    @Query("SELECT * FROM person_birthday_table WHERE name LIKE :name ORDER BY name DESC")
+    fun getAllPeopleByNameDesc(name: String): LiveData<List<PersonBirthday>>
+    @Query("SELECT * FROM person_birthday_table WHERE name LIKE :name ORDER BY birthday_date ASC")
+    fun getAllPeopleByDateAsc(name: String): LiveData<List<PersonBirthday>>
+    @Query("SELECT * FROM person_birthday_table WHERE name LIKE :name ORDER BY birthday_date DESC")
+    fun getAllPeopleByDateDesc(name: String): LiveData<List<PersonBirthday>>
     @Query("SELECT * FROM person_birthday_table WHERE name LIKE :name")
     fun searchPeople(name: String): LiveData<List<PersonBirthday>>
 }

@@ -205,8 +205,8 @@ class PeopleShowFragment: Fragment() {
             R.id.menu_add -> {
                 if(ContextCompat.checkSelfPermission(activity as AppCompatActivity,
                         Manifest.permission.READ_CONTACTS)  != PackageManager.PERMISSION_GRANTED) {
-                    ActivityCompat.requestPermissions(
-                        activity as AppCompatActivity, arrayOf(Manifest.permission.READ_CONTACTS),
+                    requestPermissions(
+                        arrayOf(Manifest.permission.READ_CONTACTS),
                         1)
                     //Snackbar.make(, "Нет доступа", Snackbar.LENGTH_SHORT).show()
                     return true
@@ -234,6 +234,23 @@ class PeopleShowFragment: Fragment() {
             }
         }
         return super.onOptionsItemSelected(item)
+    }
+
+    override fun onRequestPermissionsResult(requestCode: Int,
+                                            permissions: Array<String>, grantResults: IntArray) {
+        when (requestCode) {
+            1 -> {
+                // If request is cancelled, the result arrays are empty.
+                if ((grantResults.isNotEmpty() && grantResults[0] == PackageManager.PERMISSION_GRANTED)) {
+                    val list: List<PersonBirthday> = getContactList()
+                    viewModel!!.addPeople(list)
+                } else {
+                    // permission denied, boo! Disable the
+                    // functionality that depends on this permission.
+                }
+                return
+            }
+        }
     }
 
     private fun toggleActionMode() {

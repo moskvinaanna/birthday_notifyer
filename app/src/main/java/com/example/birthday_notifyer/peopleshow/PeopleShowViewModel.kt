@@ -15,7 +15,7 @@ class PeopleShowViewModel (
     private var viewModelJob = Job()
     private val uiScope = CoroutineScope(Dispatchers.Main + viewModelJob)
 
-    var people = database.getAllPeople()
+    var people = database.getAllPeopleByNameAsc("%%")
     private val _navigateToPeopleEdit = MutableLiveData<String>()
 
     val navigateToPeopleEdit: LiveData<String>
@@ -61,23 +61,23 @@ class PeopleShowViewModel (
     }
 
     fun onSearchPeople(name: String){
-        people = database.searchPeople("%"+name+"%")
+        people = database.getAllPeopleByNameAsc("%"+name+"%")
     }
 
     fun onSortByNameAsc(){
-        people =  database.getAllPeopleByNameAsc()
+        people =  database.getAllPeopleByNameAsc("%%")
     }
 
     fun onSortByNameDesc(){
-        people =  database.getAllPeopleByNameDesc()
+        people =  database.getAllPeopleByNameDesc("%%")
     }
 
     fun onSortByDateAsc(){
-        people =  database.getAllPeopleByDateAsc()
+        people =  database.getAllPeopleByDateAsc("%%")
     }
 
     fun onSortByDateDesc(){
-        people =  database.getAllPeopleByDateDesc()
+        people =  database.getAllPeopleByDateDesc("%%")
     }
 
 //        uiScope.launch {

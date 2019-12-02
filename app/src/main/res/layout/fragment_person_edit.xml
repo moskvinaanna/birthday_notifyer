@@ -115,7 +115,7 @@
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toBottomOf="@+id/phone_edit"
             tools:srcCompat="@tools:sample/avatars"
-            app:placeholderImage="@drawable/ic_camera"/>
+            app:placeholderImage="@drawable/ic_camera2"/>
 
     </androidx.constraintlayout.widget.ConstraintLayout>
 </layout>
