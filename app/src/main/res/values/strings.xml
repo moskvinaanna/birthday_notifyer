@@ -23,4 +23,7 @@
     <string name="sort_by_name_desc">По имени (по убыванию)</string>
     <string name="sort_by_date_asc">Сортировать по дате (по возрастанию)</string>
     <string name="sort_by_date_desc">По дате (по убыванию)</string>
+    <string name="name_edit_material">Имя</string>
+    <string name="birthday_date_material">Дата рождения</string>
+    <string name="phone_material">Номер телефона</string>
 </resources>

@@ -16,9 +16,9 @@ class PeopleShowViewModel (
     private val uiScope = CoroutineScope(Dispatchers.Main + viewModelJob)
 
     var people = database.getAllPeopleByNameAsc("%%")
-    private val _navigateToPeopleEdit = MutableLiveData<String>()
+    private val _navigateToPeopleEdit = MutableLiveData<Long>()
 
-    val navigateToPeopleEdit: LiveData<String>
+    val navigateToPeopleEdit: LiveData<Long>
         get() = _navigateToPeopleEdit
 
     private suspend fun insert(person: PersonBirthday) {
@@ -41,7 +41,7 @@ class PeopleShowViewModel (
 
     fun onAdd(){
         uiScope.launch {
-            _navigateToPeopleEdit.value = ""
+            _navigateToPeopleEdit.value = -1L
         }
     }
 
@@ -86,7 +86,7 @@ class PeopleShowViewModel (
 //            }
 //        }
 
-    fun onRemove(idList: List<String>){
+    fun onRemove(idList: List<Long>){
         uiScope.launch{
             withContext(Dispatchers.IO){
                 database.removePeople(idList)
@@ -98,7 +98,7 @@ class PeopleShowViewModel (
         viewModelJob.cancel()
     }
 
-    fun onPersonClicked(id: String) {
+    fun onPersonClicked(id: Long) {
         _navigateToPeopleEdit.value = id
     }
 

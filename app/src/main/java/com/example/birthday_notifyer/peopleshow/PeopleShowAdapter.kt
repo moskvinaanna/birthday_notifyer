@@ -14,17 +14,17 @@ import java.io.File
 
 class PeopleShowAdapter(val clickListener: PersonBirthdayListener) :
     ListAdapter<PersonBirthday, PeopleShowAdapter.ViewHolder>(PersonBirthdayDiffCallback()) {
-    private var tracker: SelectionTracker<String>? = null
+    private var tracker: SelectionTracker<Long>? = null
     init {
-        setHasStableIds(true)
+        //setHasStableIds(true)
     }
     override fun onBindViewHolder(holder: ViewHolder, position: Int) {
         holder.bind(position, getItem(position)!!, clickListener)
-        holder.itemView.isActivated = tracker!!.isSelected(getItem(position).personId.toString())
+        holder.itemView.isActivated = tracker!!.isSelected(getItem(position).personId)
     }
 
     override fun getItemId(position: Int): Long {
-        return position.toLong()
+        return getItem(position).personId
     }
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ViewHolder {
@@ -43,7 +43,7 @@ class PeopleShowAdapter(val clickListener: PersonBirthdayListener) :
         return allPeople
     }
 
-    fun setTracker(tracker: SelectionTracker<String>) {
+    fun setTracker(tracker: SelectionTracker<Long>) {
         this.tracker = tracker
     }
 
@@ -90,6 +90,6 @@ class PersonBirthdayDiffCallback : DiffUtil.ItemCallback<PersonBirthday>() {
 }
 
 
-class PersonBirthdayListener(val clickListener: (personId: String) -> Unit) {
-    fun onClick(person: PersonBirthday) = clickListener(person.personId!!)
+class PersonBirthdayListener(val clickListener: (personId: Long) -> Unit) {
+    fun onClick(person: PersonBirthday) = clickListener(person.personId)
 }

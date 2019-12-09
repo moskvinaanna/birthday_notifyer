@@ -66,7 +66,7 @@ class PeopleEditFragment: Fragment() {
                 this, viewModelFactory).get(PeopleEditViewModel::class.java)
         var person: PersonBirthday? = null
         photo = binding.photoView
-        if (arguments.personKey != ""){
+        if (arguments.personKey != -1L){
                uiScope.launch {
                    person = peopleEditViewModel.getPersonFromDataBase()
                    binding.nameEdit.setText(person!!.name)
@@ -116,13 +116,13 @@ class PeopleEditFragment: Fragment() {
 
         binding.saveButton.setOnClickListener{
             var filePath: String = ""
-            var personId: String = UUID.randomUUID().toString()
+            var personId: Long = peopleEditViewModel.getLastId()
             if (person != null)
                 personId = person!!.personId
             if (photoUri != null) {
                 filePath = getExternalFilesDirs((activity as AppCompatActivity), null).get(0).getAbsolutePath() + "/" + personId
                 try {
-                    if (photoUri!!.lastPathSegment != personId) {
+                    if (photoUri!!.lastPathSegment != personId.toString()) {
                         val outFile = File(filePath)
                         val inputStream: InputStream? =  (activity as AppCompatActivity).getContentResolver().openInputStream(photoUri!!)
                         val os: OutputStream = FileOutputStream(outFile)
@@ -137,20 +137,18 @@ class PeopleEditFragment: Fragment() {
                 }
             } else if (person != null) {
                 val p: String =
-                    getExternalFilesDirs((activity as AppCompatActivity), null).get(0).getAbsolutePath() + "/" + person!!.personId
+                    getExternalFilesDirs((activity as AppCompatActivity), null).get(0).getAbsolutePath() + "/" + person!!.personId.toString()
                 val file = File(p)
                 if (file.exists()) file.delete()
             }
             if (dateTextView!!.text.toString() == "") {
-                peopleEditViewModel.onSave(
-                    personId, binding.nameEdit.text.toString(),
+                peopleEditViewModel.onSave(binding.nameEdit.text.toString(),
                     binding.phoneEdit.text.toString(), null, filePath
 
                 )
             }
             else{
-                peopleEditViewModel.onSave(
-                    personId, binding.nameEdit.text.toString(),
+                peopleEditViewModel.onSave(binding.nameEdit.text.toString(),
                     binding.phoneEdit.text.toString(), cal.timeInMillis, filePath
 
                 )

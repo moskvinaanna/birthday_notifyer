@@ -36,7 +36,7 @@ import java.util.*
 class PeopleShowFragment: Fragment() {
     private var toolbar: Toolbar? = null
     private var viewModel: PeopleShowViewModel? = null
-    private var tracker: SelectionTracker<String>? = null
+    private var tracker: SelectionTracker<Long>? = null
     private var adapter: PeopleShowAdapter? = null
     private var actionMode: ActionMode? = null
     private var popupMenu: PopupMenu? = null
@@ -77,7 +77,7 @@ class PeopleShowFragment: Fragment() {
             recyclerView,
             PersonItemKeyProvider(adapter!!),
             PersonItemLookup(recyclerView),
-            StorageStrategy.createStringStorage()
+            StorageStrategy.createLongStorage()
         ).build()
 
         adapter!!.setTracker(tracker!!)
@@ -112,7 +112,7 @@ class PeopleShowFragment: Fragment() {
             )
         var peopleList: MutableList<PersonBirthday> = mutableListOf()
         while (cur != null && cur.moveToNext()) {
-            var person = PersonBirthday(personId = UUID.randomUUID().toString(),
+            var person = PersonBirthday(
                 name = cur.getString(cur.getColumnIndex(ContactsContract.CommonDataKinds.Phone.DISPLAY_NAME)),
                 phoneNum = cur.getString(cur.getColumnIndex(ContactsContract.CommonDataKinds.Phone.NUMBER)),
                 birthdayDate = null)
@@ -163,6 +163,7 @@ class PeopleShowFragment: Fragment() {
                 adapter!!.notifyDataSetChanged()
             }
         })
+
     }
 
     override fun onCreateOptionsMenu(menu: Menu, inflater: MenuInflater) {
@@ -300,7 +301,7 @@ class PeopleShowFragment: Fragment() {
             when (item.itemId) {
                 R.id.menu_select_all -> {
                     if (tracker!!.selection.size() != adapter!!.itemCount){
-                        val ids = ArrayList<String>()
+                        val ids = ArrayList<Long>()
                         for (person in adapter!!.getAllPeople())
                             ids.add(person.personId)
                         tracker!!.setItemsSelected(ids, true)
@@ -311,11 +312,11 @@ class PeopleShowFragment: Fragment() {
                     }
                 }
                 R.id.menu_edit -> {
-                    val uuid = tracker!!.getSelection().iterator().next().toString()
-                    viewModel!!.onPersonClicked(uuid)
+                    val id = tracker!!.getSelection().iterator().next()
+                    viewModel!!.onPersonClicked(id)
                 }
                 R.id.menu_remove -> {
-                    val ids = ArrayList<String>()
+                    val ids = ArrayList<Long>()
                     for (person in adapter!!.getAllPeople()) {
                         if (tracker!!.selection.contains(person.personId)) {
                             ids.add(person.personId)
@@ -326,7 +327,7 @@ class PeopleShowFragment: Fragment() {
                         }
                     }
                     viewModel!!.onRemove(ids)
-                    adapter!!.submitList(null)
+                    //adapter!!.submitList(null)
                     actionMode!!.finish()
                     actionMode = null
                 }
@@ -343,28 +344,29 @@ class PeopleShowFragment: Fragment() {
 }
 
 class PersonItemKeyProvider(private val adapter: PeopleShowAdapter) :
-    ItemKeyProvider<String>(SCOPE_MAPPED) {
+    ItemKeyProvider<Long>(SCOPE_MAPPED) {
 
-    override fun getKey(position: Int): String? {
+    override fun getKey(position: Int): Long? {
         if (position < adapter.getAllPeople().size)
             return adapter.getPerson(position).personId
         return null
     }
 
-    override fun getPosition(key: String): Int {
+    override fun getPosition(key: Long): Int {
         var pos = RecyclerView.NO_POSITION
         for (i in 0 until adapter.getAllPeople().size) {
             if (adapter.getPerson(i).personId == key)
                 pos = i
-                break
+            break
         }
         return pos
     }
+
 }
 
-class PersonItemLookup(private val recyclerView: RecyclerView) : ItemDetailsLookup<String>() {
+class PersonItemLookup(private val recyclerView: RecyclerView) : ItemDetailsLookup<Long>() {
 
-    override fun getItemDetails(e: MotionEvent): ItemDetails<String>? {
+    override fun getItemDetails(e: MotionEvent): ItemDetails<Long>? {
         val view = recyclerView.findChildViewUnder(e.x, e.y)
         if (view != null) {
             val viewHolder = recyclerView.getChildViewHolder(view)
@@ -377,14 +379,14 @@ class PersonItemLookup(private val recyclerView: RecyclerView) : ItemDetailsLook
     }
 }
 
-class PersonItemDetail(private val position: Int, private val selectionKey: String) :
-    ItemDetailsLookup.ItemDetails<String>() {
+class PersonItemDetail(private val position: Int, private val selectionKey: Long) :
+    ItemDetailsLookup.ItemDetails<Long>() {
 
     override fun getPosition(): Int {
         return position
     }
 
-    override fun getSelectionKey(): String? {
+    override fun getSelectionKey(): Long? {
         return selectionKey
     }
 }
