@@ -116,7 +116,7 @@ class PeopleEditFragment: Fragment() {
 
         binding.saveButton.setOnClickListener{
             var filePath: String = ""
-            var personId: Long = peopleEditViewModel.getLastId()
+            var personId: Long = 0L
             if (person != null)
                 personId = person!!.personId
             if (photoUri != null) {

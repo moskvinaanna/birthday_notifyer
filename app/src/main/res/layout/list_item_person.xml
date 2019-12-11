@@ -26,9 +26,9 @@
 
         <androidx.constraintlayout.widget.ConstraintLayout
             android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:orientation="vertical"
-            android:onClick="@{() -> clickListener.onClick(person)}">
+            android:layout_height="match_parent"
+            android:onClick="@{() -> clickListener.onClick(person)}"
+            android:orientation="vertical">
 
             <TextView
                 android:id="@+id/phone_label"
@@ -52,8 +52,8 @@
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintTop_toTopOf="parent"
                 app:layout_constraintVertical_bias="0.321"
-                tools:srcCompat="@tools:sample/avatars"
-                app:placeholderImage="@drawable/ic_person"/>
+                app:placeholderImage="@drawable/ic_person"
+                tools:srcCompat="@tools:sample/avatars" />
 
             <TextView
                 android:id="@+id/name_label"
@@ -74,6 +74,15 @@
                 app:layout_constraintBottom_toTopOf="@+id/phone_label"
                 app:layout_constraintStart_toEndOf="@+id/photo"
                 app:layout_constraintTop_toBottomOf="@+id/name_label" />
+
+            <TextView
+                android:id="@+id/textView"
+                android:layout_width="213dp"
+                android:layout_height="27dp"
+                app:idString="@{person}"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@+id/phone_label" />
         </androidx.constraintlayout.widget.ConstraintLayout>
     </androidx.cardview.widget.CardView>
 </layout>

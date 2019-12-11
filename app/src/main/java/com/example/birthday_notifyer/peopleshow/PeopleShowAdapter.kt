@@ -12,42 +12,56 @@ import com.example.birthday_notifyer.databinding.ListItemPersonBinding
 import com.facebook.drawee.view.SimpleDraweeView
 import java.io.File
 
-class PeopleShowAdapter(val clickListener: PersonBirthdayListener) :
-    ListAdapter<PersonBirthday, PeopleShowAdapter.ViewHolder>(PersonBirthdayDiffCallback()) {
+class PeopleShowAdapter(val clickListener: PersonBirthdayListener) : RecyclerView.Adapter<PeopleShowAdapter.PersonViewHolder>() {
     private var tracker: SelectionTracker<Long>? = null
+    var items: MutableList<PersonBirthday> = mutableListOf()
     init {
-        //setHasStableIds(true)
+        setHasStableIds(true)
     }
-    override fun onBindViewHolder(holder: ViewHolder, position: Int) {
-        holder.bind(position, getItem(position)!!, clickListener)
-        holder.itemView.isActivated = tracker!!.isSelected(getItem(position).personId)
+    override fun onBindViewHolder(holder: PersonViewHolder, position: Int) {
+        holder.itemView.isActivated = tracker!!.isSelected(items[position].personId)
+        holder.bind(position, items[position], clickListener)
+
     }
 
     override fun getItemId(position: Int): Long {
-        return getItem(position).personId
+        return (position).toLong()
     }
 
-    override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ViewHolder {
-        return ViewHolder.from(parent)
+    override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): PersonViewHolder {
+        return PersonViewHolder.from(parent)
     }
 
     fun getPerson(position: Int): PersonBirthday{
-        return getItem(position)
+        return items[position]
     }
 
     fun getAllPeople(): List<PersonBirthday> {
-        var allPeople: MutableList<PersonBirthday> = mutableListOf()
-        for (i in 0 until this.itemCount) {
-            allPeople.add(getItem(i))
-        }
-        return allPeople
+        return items
     }
 
     fun setTracker(tracker: SelectionTracker<Long>) {
         this.tracker = tracker
     }
+    fun setItemsWithDiff(items: List<PersonBirthday>) {
+        val diffCallback: DiffUtil.Callback = object : DiffUtil.Callback() {
+            override fun getOldListSize(): Int = this@PeopleShowAdapter.items.size
 
-    class ViewHolder private constructor(val binding: ListItemPersonBinding) :
+            override fun getNewListSize(): Int = items.size
+
+            override fun areItemsTheSame(oldItemPosition: Int, newItemPosition: Int): Boolean =
+                this@PeopleShowAdapter.items[oldItemPosition].personId == items[newItemPosition].personId
+
+            override fun areContentsTheSame(oldItemPosition: Int, newItemPosition: Int): Boolean =
+                this@PeopleShowAdapter.items[oldItemPosition] == items[newItemPosition]
+        }
+        val diffResult: DiffUtil.DiffResult = DiffUtil.calculateDiff(diffCallback)
+        this.items.clear()
+        this.items.addAll(items)
+        diffResult.dispatchUpdatesTo(this)
+    }
+
+    class PersonViewHolder private constructor(val binding: ListItemPersonBinding) :
         RecyclerView.ViewHolder(binding.root) {
         private var personItemDetail: PersonItemDetail? = null
 
@@ -68,26 +82,30 @@ class PeopleShowAdapter(val clickListener: PersonBirthdayListener) :
         }
 
         companion object {
-            fun from(parent: ViewGroup): ViewHolder {
+            fun from(parent: ViewGroup): PersonViewHolder {
                 val layoutInflater = LayoutInflater.from(parent.context)
                 val binding = ListItemPersonBinding.inflate(layoutInflater, parent, false)
-                return ViewHolder(binding)
+                return PersonViewHolder(binding)
             }
         }
     }
-}
 
-
-class PersonBirthdayDiffCallback : DiffUtil.ItemCallback<PersonBirthday>() {
-
-    override fun areItemsTheSame(oldItem: PersonBirthday, newItem: PersonBirthday): Boolean {
-        return oldItem.personId == newItem.personId
-    }
-
-    override fun areContentsTheSame(oldItem: PersonBirthday, newItem: PersonBirthday): Boolean {
-        return oldItem == newItem
+    override fun getItemCount(): Int {
+        return items.count()
     }
 }
+
+
+//class PersonBirthdayDiffCallback : DiffUtil.ItemCallback<PersonBirthday>() {
+//
+//    override fun areItemsTheSame(oldItem: PersonBirthday, newItem: PersonBirthday): Boolean {
+//        return oldItem.personId == newItem.personId
+//    }
+//
+//    override fun areContentsTheSame(oldItem: PersonBirthday, newItem: PersonBirthday): Boolean {
+//        return oldItem == newItem
+//    }
+//}
 
 
 class PersonBirthdayListener(val clickListener: (personId: Long) -> Unit) {

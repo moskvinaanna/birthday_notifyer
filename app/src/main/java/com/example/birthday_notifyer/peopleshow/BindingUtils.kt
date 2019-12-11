@@ -29,6 +29,12 @@ fun TextView.setBirthdayDate(item: PersonBirthday?) {
     }
 }
 
+@BindingAdapter("idString")
+fun TextView.setPersonId(item: PersonBirthday?) {
+    item?.let {
+        text = item.personId.toString()
+    }
+}
 
 @BindingAdapter("phoneString")
 fun TextView.setPhoneNumber(item: PersonBirthday?) {

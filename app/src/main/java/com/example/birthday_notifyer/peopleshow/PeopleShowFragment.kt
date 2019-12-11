@@ -5,6 +5,7 @@ import android.content.Context
 import android.content.pm.PackageManager
 import android.os.Bundle
 import android.provider.ContactsContract
+import android.util.Log
 import android.view.*
 import android.view.inputmethod.InputMethodManager
 import androidx.appcompat.app.AppCompatActivity
@@ -56,6 +57,7 @@ class PeopleShowFragment: Fragment() {
                 this, viewModelFactory).get(PeopleShowViewModel::class.java)
 
         viewModel = peopleShowViewModel
+
         val binding: FragmentPeopleListBinding = DataBindingUtil.inflate(
             inflater, R.layout.fragment_people_list, container, false)
         binding.peopleShowViewModel = peopleShowViewModel
@@ -81,12 +83,12 @@ class PeopleShowFragment: Fragment() {
         ).build()
 
         adapter!!.setTracker(tracker!!)
-        tracker!!.addObserver(object : SelectionTracker.SelectionObserver<Any>() {
+        tracker!!.addObserver(object : SelectionTracker.SelectionObserver<Long>() {
             override fun onSelectionChanged() {
                 toggleActionMode()
             }
         })
-        binding.setLifecycleOwner(this)
+        //binding.setLifecycleOwner(this)
 
         getDataFromViewModel()
 
@@ -134,22 +136,18 @@ class PeopleShowFragment: Fragment() {
         when (menuItem.itemId){
             R.id.sort_by_date_asc -> {
                 viewModel!!.onSortByDateAsc()
-                adapter!!.submitList(null)
                 getDataFromViewModel()
             }
             R.id.sort_by_date_desc -> {
                 viewModel!!.onSortByDateDesc()
-                adapter!!.submitList(null)
                 getDataFromViewModel()
             }
             R.id.sort_by_name_asc -> {
                 viewModel!!.onSortByNameAsc()
-                adapter!!.submitList(null)
                 getDataFromViewModel()
             }
             R.id.sort_by_name_desc -> {
                 viewModel!!.onSortByNameDesc()
-                adapter!!.submitList(null)
                 getDataFromViewModel()
             }
         }
@@ -157,10 +155,10 @@ class PeopleShowFragment: Fragment() {
     }
 
     fun getDataFromViewModel(){
-        viewModel!!.people.observe(viewLifecycleOwner, Observer {
+        viewModel!!.people.observe(this, Observer {
             it?.let {
-                adapter!!.submitList(it)
-                adapter!!.notifyDataSetChanged()
+                //adapter!!.submitList(it)
+                adapter!!.setItemsWithDiff(it)
             }
         })
 
@@ -176,7 +174,6 @@ class PeopleShowFragment: Fragment() {
                 menu.findItem(R.id.menu_add).isVisible = true
                 menu.findItem(R.id.menu_sort).isVisible = true
                 viewModel!!.onSortByNameAsc()
-                adapter!!.submitList(null)
                 getDataFromViewModel()
                 val inputMethodManager = context?.getSystemService(Context.INPUT_METHOD_SERVICE) as InputMethodManager
                 inputMethodManager.hideSoftInputFromWindow(sv.windowToken, 0)
@@ -191,7 +188,6 @@ class PeopleShowFragment: Fragment() {
             override fun onQueryTextChange(newText: String): Boolean {
                 if (view != null) {
                     viewModel!!.onSearchPeople(newText)
-                    adapter!!.submitList(null)
                     getDataFromViewModel()
                 }
                 return true
@@ -327,7 +323,6 @@ class PeopleShowFragment: Fragment() {
                         }
                     }
                     viewModel!!.onRemove(ids)
-                    //adapter!!.submitList(null)
                     actionMode!!.finish()
                     actionMode = null
                 }
@@ -353,13 +348,11 @@ class PersonItemKeyProvider(private val adapter: PeopleShowAdapter) :
     }
 
     override fun getPosition(key: Long): Int {
-        var pos = RecyclerView.NO_POSITION
-        for (i in 0 until adapter.getAllPeople().size) {
+        for (i in adapter.getAllPeople().indices) {
             if (adapter.getPerson(i).personId == key)
-                pos = i
-            break
+                return  i
         }
-        return pos
+        return RecyclerView.NO_POSITION
     }
 
 }
@@ -370,8 +363,7 @@ class PersonItemLookup(private val recyclerView: RecyclerView) : ItemDetailsLook
         val view = recyclerView.findChildViewUnder(e.x, e.y)
         if (view != null) {
             val viewHolder = recyclerView.getChildViewHolder(view)
-            if (viewHolder is PeopleShowAdapter.ViewHolder) {
-                val name = viewHolder.getPersonDetails().selectionKey
+            if (viewHolder is PeopleShowAdapter.PersonViewHolder) {
                 return viewHolder.getPersonDetails()
             }
         }
