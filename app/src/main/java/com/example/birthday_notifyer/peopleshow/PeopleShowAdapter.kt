@@ -13,7 +13,7 @@ import com.facebook.drawee.view.SimpleDraweeView
 import java.io.File
 
 class PeopleShowAdapter(val clickListener: PersonBirthdayListener) : RecyclerView.Adapter<PeopleShowAdapter.PersonViewHolder>() {
-    private var tracker: SelectionTracker<Long>? = null
+    private var tracker: SelectionTracker<String>? = null
     var items: MutableList<PersonBirthday> = mutableListOf()
     init {
         setHasStableIds(true)
@@ -40,7 +40,7 @@ class PeopleShowAdapter(val clickListener: PersonBirthdayListener) : RecyclerVie
         return items
     }
 
-    fun setTracker(tracker: SelectionTracker<Long>) {
+    fun setTracker(tracker: SelectionTracker<String>) {
         this.tracker = tracker
     }
     fun setItemsWithDiff(items: List<PersonBirthday>) {
@@ -108,6 +108,6 @@ class PeopleShowAdapter(val clickListener: PersonBirthdayListener) : RecyclerVie
 //}
 
 
-class PersonBirthdayListener(val clickListener: (personId: Long) -> Unit) {
+class PersonBirthdayListener(val clickListener: (personId: String) -> Unit) {
     fun onClick(person: PersonBirthday) = clickListener(person.personId)
 }

@@ -66,7 +66,7 @@ class PeopleEditFragment: Fragment() {
                 this, viewModelFactory).get(PeopleEditViewModel::class.java)
         var person: PersonBirthday? = null
         photo = binding.photoView
-        if (arguments.personKey != -1L){
+        if (arguments.personKey != ""){
                uiScope.launch {
                    person = peopleEditViewModel.getPersonFromDataBase()
                    binding.nameEdit.setText(person!!.name)
@@ -115,51 +115,71 @@ class PeopleEditFragment: Fragment() {
         binding.peopleEditViewModel = peopleEditViewModel
 
         binding.saveButton.setOnClickListener{
-            var filePath: String = ""
-            var personId: Long = 0L
-            if (person != null)
-                personId = person!!.personId
-            if (photoUri != null) {
-                filePath = getExternalFilesDirs((activity as AppCompatActivity), null).get(0).getAbsolutePath() + "/" + personId
-                try {
-                    if (photoUri!!.lastPathSegment != personId.toString()) {
-                        val outFile = File(filePath)
-                        val inputStream: InputStream? =  (activity as AppCompatActivity).getContentResolver().openInputStream(photoUri!!)
-                        val os: OutputStream = FileOutputStream(outFile)
-                        val buffer = ByteArray(4096)
-                        while (inputStream!!.read(buffer) != -1) os.write(buffer)
-                        inputStream!!.close()
-                        os.close()
-                        val imagePipeline = Fresco.getImagePipeline()
-                        imagePipeline.evictFromCache(Uri.fromFile(outFile))
+            if (binding.nameEdit.text!!.isEmpty() || binding.phoneEdit.text!!.isEmpty() || binding.dateEdit.text!!.isEmpty()) {
+                if (binding.nameEdit.text!!.isEmpty())
+                    binding.nameEdit.error = "Введите имя"
+                if (binding.phoneEdit.text!!.isEmpty())
+                    binding.phoneEdit.error = "Введите номер телефона"
+                if (binding.dateEdit.text!!.isEmpty())
+                    binding.dateEdit.error = "Введите дату рождения"
+            }
+            else {
+                var filePath: String = ""
+                var personId: String = UUID.randomUUID().toString()
+                if (person != null)
+                    personId = person!!.personId
+                if (photoUri != null) {
+                    filePath = getExternalFilesDirs(
+                        (activity as AppCompatActivity),
+                        null
+                    ).get(0).getAbsolutePath() + "/" + personId
+                    try {
+                        if (photoUri!!.lastPathSegment != personId.toString()) {
+                            val outFile = File(filePath)
+                            val inputStream: InputStream? =
+                                (activity as AppCompatActivity).getContentResolver()
+                                    .openInputStream(photoUri!!)
+                            val os: OutputStream = FileOutputStream(outFile)
+                            val buffer = ByteArray(4096)
+                            while (inputStream!!.read(buffer) != -1) os.write(buffer)
+                            inputStream!!.close()
+                            os.close()
+                            val imagePipeline = Fresco.getImagePipeline()
+                            imagePipeline.evictFromCache(Uri.fromFile(outFile))
+                        }
+                    } catch (e: Exception) {
                     }
-                } catch (e: Exception) {
+                } else if (person != null) {
+                    val p: String =
+                        getExternalFilesDirs(
+                            (activity as AppCompatActivity),
+                            null
+                        ).get(0).getAbsolutePath() + "/" + person!!.personId.toString()
+                    val file = File(p)
+                    if (file.exists()) file.delete()
                 }
-            } else if (person != null) {
-                val p: String =
-                    getExternalFilesDirs((activity as AppCompatActivity), null).get(0).getAbsolutePath() + "/" + person!!.personId.toString()
-                val file = File(p)
-                if (file.exists()) file.delete()
-            }
-            if (dateTextView!!.text.toString() == "") {
-                peopleEditViewModel.onSave(binding.nameEdit.text.toString(),
-                    binding.phoneEdit.text.toString(), null, filePath
+                if (dateTextView!!.text.toString() == "") {
+                    peopleEditViewModel.onSave(
+                        UUID.randomUUID().toString(), binding.nameEdit.text.toString(),
+                        binding.phoneEdit.text.toString(), null, filePath
 
-                )
-            }
-            else{
-                peopleEditViewModel.onSave(binding.nameEdit.text.toString(),
-                    binding.phoneEdit.text.toString(), cal.timeInMillis, filePath
+                    )
+                } else {
+                    peopleEditViewModel.onSave(
+                        UUID.randomUUID().toString(), binding.nameEdit.text.toString(),
+                        binding.phoneEdit.text.toString(), cal.timeInMillis, filePath
 
-                )
+                    )
 
+                }
+                val inputMethodManager =
+                    this.context?.getSystemService(Context.INPUT_METHOD_SERVICE) as InputMethodManager
+                inputMethodManager.hideSoftInputFromWindow(binding.phoneEdit.windowToken, 0)
             }
-            val inputMethodManager = this.context?.getSystemService(Context.INPUT_METHOD_SERVICE) as InputMethodManager
-            inputMethodManager.hideSoftInputFromWindow(binding.phoneEdit.windowToken, 0)
         }
 
         // Add an Observer to the state variable for Navigating when a Quality icon is tapped.
-        peopleEditViewModel.navigateToPeopleShow.observe(this, Observer {
+        peopleEditViewModel.navigateToPeopleShow.observe(viewLifecycleOwner, Observer {
             if (it == true) {
                 this.findNavController().navigate(
                     PeopleEditFragmentDirections.actionPeopleEditFragmentToPeopleListFragment())

@@ -5,7 +5,7 @@ import androidx.lifecycle.ViewModelProvider
 import com.example.birthday_notifyer.database.BirthdayDatabaseDao
 
 class PeopleEditViewModelFactory(
-    private val personKey: Long,
+    private val personKey: String,
     private val dataSource: BirthdayDatabaseDao
 ) : ViewModelProvider.Factory {
     @Suppress("unchecked_cast")
