@@ -4,6 +4,7 @@ import android.Manifest
 import android.content.Context
 import android.content.pm.PackageManager
 import android.os.Bundle
+import android.os.Handler
 import android.provider.ContactsContract
 import android.util.Log
 import android.view.*
@@ -31,6 +32,7 @@ import com.example.birthday_notifyer.database.BirthdayDatabase
 import com.example.birthday_notifyer.database.PersonBirthday
 import com.example.birthday_notifyer.databinding.FragmentPeopleListBinding
 import com.google.android.material.snackbar.Snackbar
+import kotlinx.coroutines.delay
 import java.io.File
 import java.util.*
 
@@ -81,6 +83,7 @@ class PeopleShowFragment: Fragment() {
             PersonItemLookup(recyclerView),
             StorageStrategy.createLongStorage()
         ).build()
+        recyclerView.setItemAnimator(null)
 
         adapter!!.setTracker(tracker!!)
         tracker!!.addObserver(object : SelectionTracker.SelectionObserver<Long>() {
@@ -92,7 +95,7 @@ class PeopleShowFragment: Fragment() {
 
         getDataFromViewModel()
 
-        peopleShowViewModel.navigateToPeopleEdit.observe(this,
+        peopleShowViewModel.navigateToPeopleEdit.observe(viewLifecycleOwner,
             Observer {person ->
                 person?.let{
                     this.findNavController().navigate(PeopleShowFragmentDirections.
@@ -155,10 +158,10 @@ class PeopleShowFragment: Fragment() {
     }
 
     fun getDataFromViewModel(){
-        viewModel!!.people.observe(this, Observer {
+        viewModel!!.people.observe(viewLifecycleOwner, Observer {
             it?.let {
                 //adapter!!.submitList(it)
-                adapter!!.setItemsWithDiff(it)
+                    adapter!!.setItemsWithDiff(it)
             }
         })
 
@@ -303,8 +306,7 @@ class PeopleShowFragment: Fragment() {
                         tracker!!.setItemsSelected(ids, true)
                     }
                     else  {
-                        actionMode!!.finish()
-                        actionMode = null
+                        mode.finish()
                     }
                 }
                 R.id.menu_edit -> {
@@ -322,9 +324,9 @@ class PeopleShowFragment: Fragment() {
                             }
                         }
                     }
+
+                    mode.finish()
                     viewModel!!.onRemove(ids)
-                    actionMode!!.finish()
-                    actionMode = null
                 }
             }
             return true
