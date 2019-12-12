@@ -8,6 +8,8 @@ interface BirthdayDatabaseDao {
 
     @Insert(onConflict = OnConflictStrategy.IGNORE)
     fun insert(person: PersonBirthday)
+    @Insert(onConflict = OnConflictStrategy.IGNORE)
+    fun insertAll(people: List<PersonBirthday>)
     @Update
     fun update(person: PersonBirthday)
     @Query("SELECT * from person_birthday_table WHERE personId = :key")

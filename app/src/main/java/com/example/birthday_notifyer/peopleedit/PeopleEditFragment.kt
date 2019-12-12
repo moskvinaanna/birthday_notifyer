@@ -9,6 +9,7 @@ import android.net.Uri
 import android.os.Bundle
 import android.util.Log
 import android.view.LayoutInflater
+import android.view.MenuItem
 import android.view.View
 import android.view.ViewGroup
 import android.view.inputmethod.InputMethodManager
@@ -22,6 +23,7 @@ import androidx.fragment.app.Fragment
 import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProviders
 import androidx.navigation.fragment.findNavController
+import androidx.navigation.ui.NavigationUI
 import com.example.birthday_notifyer.R
 import com.example.birthday_notifyer.database.BirthdayDatabase
 import com.example.birthday_notifyer.database.PersonBirthday
@@ -95,10 +97,10 @@ class PeopleEditFragment: Fragment() {
                     .setTitle("Выберите действие")
                     .setPositiveButton(
                         "Изменить"
-                    ) { dialog: DialogInterface?, which: Int -> selectFile() }
+                    ) { _: DialogInterface?, _: Int -> selectFile() }
                     .setNegativeButton(
                         "Удалить"
-                    ) { dialog: DialogInterface?, which: Int ->
+                    ) { _: DialogInterface?, _: Int ->
                         val imagePipeline = Fresco.getImagePipeline()
                         imagePipeline.evictFromCache(photoUri)
                         photo!!.setImageURI(Uri.EMPTY, null)

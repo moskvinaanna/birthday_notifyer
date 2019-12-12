@@ -27,6 +27,12 @@ class PeopleShowViewModel (
         }
     }
 
+    private suspend fun insertAll(people: List<PersonBirthday>) {
+        withContext(Dispatchers.IO) {
+            database.insertAll(people)
+        }
+    }
+
     private suspend fun update(person: PersonBirthday) {
         withContext(Dispatchers.IO) {
             database.update(person)
@@ -45,11 +51,16 @@ class PeopleShowViewModel (
         }
     }
 
+    fun addPerson(person:PersonBirthday){
+        uiScope.launch { insert(person) }
+    }
+
     fun addPeople(people: List<PersonBirthday>){
         uiScope.launch {
-            for (person in people) {
-                insert(person)
-            }
+//            for (person in people) {
+//                insert(person)
+//            }
+            insertAll(people)
         }
     }
 

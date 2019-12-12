@@ -43,6 +43,7 @@ class PeopleShowFragment: Fragment() {
     private var adapter: PeopleShowAdapter? = null
     private var actionMode: ActionMode? = null
     private var popupMenu: PopupMenu? = null
+    private var recyclerView: RecyclerView? = null
 
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?,
@@ -74,16 +75,16 @@ class PeopleShowFragment: Fragment() {
             peopleShowViewModel.onPersonClicked(personId)
         })
         //this.adapter = adapter
-        val recyclerView = binding.peopleList
-        recyclerView.adapter = adapter
+        recyclerView = binding.peopleList
+        recyclerView!!.adapter = adapter
         tracker = SelectionTracker.Builder(
             "selected",
-            recyclerView,
+            recyclerView!!,
             PersonItemKeyProvider(adapter!!),
-            PersonItemLookup(recyclerView),
+            PersonItemLookup(recyclerView!!),
             StorageStrategy.createStringStorage()
         ).build()
-        recyclerView.setItemAnimator(null)
+        recyclerView!!.setItemAnimator(null)
 
         adapter!!.setTracker(tracker!!)
         tracker!!.addObserver(object : SelectionTracker.SelectionObserver<String>() {
@@ -94,7 +95,6 @@ class PeopleShowFragment: Fragment() {
         //binding.setLifecycleOwner(this)
 
         getDataFromViewModel()
-
         peopleShowViewModel.navigateToPeopleEdit.observe(viewLifecycleOwner,
             Observer {person ->
                 person?.let{
@@ -213,6 +213,7 @@ class PeopleShowFragment: Fragment() {
                 }
                 val list: List<PersonBirthday> = getContactList()
                 viewModel!!.addPeople(list)
+
             }
                // viewModel?.onAdd() }
             R.id.menu_search -> {

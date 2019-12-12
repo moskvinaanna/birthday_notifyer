@@ -28,6 +28,10 @@ class PeopleShowAdapter(val clickListener: PersonBirthdayListener) : RecyclerVie
         return (position).toLong()
     }
 
+    override fun getItemViewType(position: Int): Int {
+        return position
+    }
+
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): PersonViewHolder {
         return PersonViewHolder.from(parent)
     }
