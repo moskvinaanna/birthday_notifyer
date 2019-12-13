@@ -1,5 +1,6 @@
 package com.example.birthday_notifyer.peopleshow
 
+import android.graphics.Color
 import android.net.Uri
 import android.view.LayoutInflater
 import android.view.ViewGroup
@@ -76,6 +77,10 @@ class PeopleShowAdapter(val clickListener: PersonBirthdayListener) : RecyclerVie
                 photoView.setImageURI(Uri.fromFile(File(item.photo)), null)
             else
                 photoView.setImageURI(Uri.EMPTY, null)
+            if (binding.cardView.isActivated)
+                binding.cardView.setBackgroundColor(Color.LTGRAY)
+            else
+                binding.cardView.setBackgroundColor(Color.WHITE)
             binding.clickListener = clickListener
             binding.executePendingBindings()
             personItemDetail = PersonItemDetail(pos, item.personId)
