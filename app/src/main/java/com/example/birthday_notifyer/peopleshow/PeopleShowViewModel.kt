@@ -79,20 +79,20 @@ class PeopleShowViewModel (
         people = database.getAllPeopleByNameAsc("%"+name+"%")
     }
 
-    fun onSortByNameAsc(){
-        people =  database.getAllPeopleByNameAsc("%%")
+    fun onSortByNameAsc(name: String){
+        people =  database.getAllPeopleByNameAsc("%"+name+"%")
     }
 
-    fun onSortByNameDesc(){
-        people =  database.getAllPeopleByNameDesc("%%")
+    fun onSortByNameDesc(name: String){
+        people =  database.getAllPeopleByNameDesc("%"+name+"%")
     }
 
-    fun onSortByDateAsc(){
-        people =  database.getAllPeopleByDateAsc("%%")
+    fun onSortByDateAsc(name: String){
+        people =  database.getAllPeopleByDateAsc("%"+name+"%")
     }
 
-    fun onSortByDateDesc(){
-        people =  database.getAllPeopleByDateDesc("%%")
+    fun onSortByDateDesc(name: String){
+        people =  database.getAllPeopleByDateDesc("%"+name+"%")
     }
 
 //        uiScope.launch {

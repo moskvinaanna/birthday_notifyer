@@ -26,4 +26,6 @@
     <string name="name_edit_material">Имя</string>
     <string name="birthday_date_material">Дата рождения</string>
     <string name="phone_material">Номер телефона</string>
+    <string name="add_manually">Добавить вручную</string>
+    <string name="add_from_contacts">Добавить из контактов</string>
 </resources>

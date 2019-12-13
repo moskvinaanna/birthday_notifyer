@@ -42,6 +42,9 @@ class PeopleShowFragment: Fragment() {
     private var actionMode: ActionMode? = null
     private var popupMenu: PopupMenu? = null
     private var recyclerView: RecyclerView? = null
+    private var isSortByName: Boolean = true
+    private var isSortAsc: Boolean = true
+    private var searchText: String = ""
 
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?,
@@ -56,6 +59,10 @@ class PeopleShowFragment: Fragment() {
         val peopleShowViewModel =
             ViewModelProviders.of(
                 this, viewModelFactory).get(PeopleShowViewModel::class.java)
+        if (savedInstanceState != null){
+            isSortByName = savedInstanceState.getBoolean("isSortByName")
+            isSortAsc = savedInstanceState.getBoolean("isSortAsc")
+        }
 
         viewModel = peopleShowViewModel
 
@@ -141,22 +148,38 @@ class PeopleShowFragment: Fragment() {
         super.onPause()
     }
 
+    private fun popUpClickAdd(menuItem: MenuItem): Boolean{
+        when (menuItem.itemId){
+            R.id.add_manually -> {
+                viewModel!!.onAdd()
+            }
+            R.id.add_from_contacts -> {
+                addFromContacts()
+            }
+        }
+        return true
+    }
+
     private fun popUpClick(menuItem: MenuItem): Boolean{
         when (menuItem.itemId){
             R.id.sort_by_date_asc -> {
-                viewModel!!.onSortByDateAsc()
+                isSortAsc = true
+                isSortByName = true
                 getDataFromViewModel()
             }
             R.id.sort_by_date_desc -> {
-                viewModel!!.onSortByDateDesc()
+                isSortAsc = false
+                isSortByName = true
                 getDataFromViewModel()
             }
             R.id.sort_by_name_asc -> {
-                viewModel!!.onSortByNameAsc()
+                isSortAsc = true
+                isSortByName = false
                 getDataFromViewModel()
             }
             R.id.sort_by_name_desc -> {
-                viewModel!!.onSortByNameDesc()
+                isSortAsc = false
+                isSortByName = false
                 getDataFromViewModel()
             }
         }
@@ -164,10 +187,18 @@ class PeopleShowFragment: Fragment() {
     }
 
     fun getDataFromViewModel(){
+        if (isSortByName && isSortAsc)
+            viewModel!!.onSortByNameAsc(searchText)
+        if (isSortByName && !isSortAsc)
+            viewModel!!.onSortByNameDesc(searchText)
+        if (!isSortByName && isSortAsc)
+            viewModel!!.onSortByNameAsc(searchText)
+        if (!isSortByName && !isSortAsc)
+            viewModel!!.onSortByNameDesc(searchText)
+        recyclerView!!.smoothScrollToPosition(0)
         viewModel!!.people.observe(viewLifecycleOwner, Observer {
             it?.let {
-                //adapter!!.submitList(it)
-                    adapter!!.setItemsWithDiff(it)
+                adapter!!.setItemsWithDiff(it)
             }
         })
 
@@ -176,19 +207,18 @@ class PeopleShowFragment: Fragment() {
     override fun onCreateOptionsMenu(menu: Menu, inflater: MenuInflater) {
         inflater.inflate(R.menu.menu_main, menu)
         val item = menu.findItem(R.id.menu_search)
-        val sv = item.actionView as SearchView
-        sv.addOnAttachStateChangeListener(object : View.OnAttachStateChangeListener {
+        val searchView = item.actionView as SearchView
+        searchView.addOnAttachStateChangeListener(object : View.OnAttachStateChangeListener {
             override fun onViewAttachedToWindow(v: View) {}
             override fun onViewDetachedFromWindow(v: View) {
                 menu.findItem(R.id.menu_add).isVisible = true
                 menu.findItem(R.id.menu_sort).isVisible = true
-                viewModel!!.onSortByNameAsc()
                 getDataFromViewModel()
                 val inputMethodManager = context?.getSystemService(Context.INPUT_METHOD_SERVICE) as InputMethodManager
-                inputMethodManager.hideSoftInputFromWindow(sv.windowToken, 0)
+                inputMethodManager.hideSoftInputFromWindow(searchView.windowToken, 0)
             }
         })
-        sv.setOnQueryTextListener(object :
+        searchView.setOnQueryTextListener(object :
             SearchView.OnQueryTextListener {
             override fun onQueryTextSubmit(query: String): Boolean {
                 return true
@@ -196,7 +226,7 @@ class PeopleShowFragment: Fragment() {
 
             override fun onQueryTextChange(newText: String): Boolean {
                 if (view != null) {
-                    viewModel!!.onSearchPeople(newText)
+                    searchText = newText
                     getDataFromViewModel()
                 }
                 return true
@@ -209,17 +239,15 @@ class PeopleShowFragment: Fragment() {
         val menu = toolbar!!.menu
         when (item.itemId) {
             R.id.menu_add -> {
-                if(ContextCompat.checkSelfPermission(activity as AppCompatActivity,
-                        Manifest.permission.READ_CONTACTS)  != PackageManager.PERMISSION_GRANTED) {
-                    requestPermissions(
-                        arrayOf(Manifest.permission.READ_CONTACTS),
-                        1)
-                    //Snackbar.make(, "Нет доступа", Snackbar.LENGTH_SHORT).show()
-                    return true
+                if (activity is AppCompatActivity){
+                    val popupMenu = PopupMenu((activity as AppCompatActivity),
+                        (activity as AppCompatActivity).findViewById(item.getItemId()))
+                    popupMenu.inflate(R.menu.popup_menu_add)
+                    popupMenu.setOnMenuItemClickListener{ it
+                        popUpClickAdd(it)
+                    }
+                    popupMenu.show()
                 }
-                val list: List<PersonBirthday> = getContactList()
-                viewModel!!.addPeople(list)
-
             }
                // viewModel?.onAdd() }
             R.id.menu_search -> {
@@ -241,6 +269,18 @@ class PeopleShowFragment: Fragment() {
             }
         }
         return super.onOptionsItemSelected(item)
+    }
+
+    private fun addFromContacts(){
+        if(ContextCompat.checkSelfPermission(activity as AppCompatActivity,
+                Manifest.permission.READ_CONTACTS)  != PackageManager.PERMISSION_GRANTED) {
+            requestPermissions(
+                arrayOf(Manifest.permission.READ_CONTACTS),
+                1)
+            return
+        }
+        val list: List<PersonBirthday> = getContactList()
+        viewModel!!.addPeople(list)
     }
 
     override fun onRequestPermissionsResult(requestCode: Int,
