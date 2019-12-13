@@ -70,7 +70,7 @@ class PeopleShowFragment: Fragment() {
         }
         setHasOptionsMenu(true)
         adapter = PeopleShowAdapter(PersonBirthdayListener { personId ->
-            peopleShowViewModel.onPersonClicked(personId)
+            peopleShowViewModel.onPersonCardClicked(personId)
         })
         //this.adapter = adapter
         recyclerView = binding.peopleList
@@ -99,6 +99,14 @@ class PeopleShowFragment: Fragment() {
                     this.findNavController().navigate(PeopleShowFragmentDirections.
                         actionPeopleListFragmentToPeopleEditFragment(person))
                     peopleShowViewModel.onPeopleEditNavigated()
+                }
+            })
+        peopleShowViewModel.navigateToPersonCard.observe(viewLifecycleOwner,
+            Observer {person ->
+                person?.let{
+                    this.findNavController().navigate(PeopleShowFragmentDirections.
+                        actionPeopleListFragmentToPersonCardFragment(person))
+                    peopleShowViewModel.onPersonCardNavigated()
                 }
             })
         return binding.root

@@ -14,6 +14,9 @@
             app:destination="@id/people_edit_fragment"
             app:enterAnim="@anim/slide_in_right"
             app:popEnterAnim="@anim/slide_in_right" />
+        <action
+            android:id="@+id/action_people_list_fragment_to_person_card_fragment"
+            app:destination="@id/person_card_fragment" />
     </fragment>
 
     <fragment
@@ -31,4 +34,21 @@
             app:popUpTo="@+id/people_list_fragment"
             app:popUpToInclusive="true" />
     </fragment>
+
+    <fragment
+        android:id="@+id/person_card_fragment"
+        android:name="com.example.birthday_notifyer.personcard.PersonCardFragment"
+        android:label="PersonCardFragment"
+        tools:layout="@layout/fragment_person_card">
+        <argument
+            android:name="personKey"
+            app:argType="string" />
+        <action
+            android:id="@+id/action_personCardFragment_to_peopleListFragment"
+            app:destination="@id/people_list_fragment"
+            app:launchSingleTop="false"
+            app:popUpTo="@+id/people_list_fragment"
+            app:popUpToInclusive="true" />
+    </fragment>
+
 </navigation>

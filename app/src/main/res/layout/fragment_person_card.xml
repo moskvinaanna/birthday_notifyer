@@ -1,0 +1,113 @@
+<?xml version="1.0" encoding="utf-8"?>
+<layout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools">
+
+    <data>
+
+        <variable
+            name="person"
+            type="com.example.birthday_notifyer.database.PersonBirthday" />
+
+        <variable
+            name="clickListener"
+            type="com.example.birthday_notifyer.peopleshow.PersonBirthdayListener" />
+    </data>
+        <androidx.constraintlayout.widget.ConstraintLayout
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:orientation="vertical">
+
+            <androidx.appcompat.widget.Toolbar
+                android:id="@+id/toolbar2"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:background="?attr/colorPrimary"
+                android:minHeight="?attr/actionBarSize"
+                android:theme="?attr/actionBarTheme"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toTopOf="parent" />
+
+            <TextView
+                android:id="@+id/phone_label"
+                android:layout_width="255dp"
+                android:layout_height="26dp"
+                android:layout_marginTop="16dp"
+                android:layout_marginEnd="16dp"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintTop_toBottomOf="@+id/date_label"
+                app:phoneString="@{person}" />
+
+            <com.facebook.drawee.view.SimpleDraweeView
+                android:id="@+id/photo"
+                android:layout_width="153dp"
+                android:layout_height="160dp"
+                android:layout_marginStart="140dp"
+                android:layout_marginTop="16dp"
+                android:contentDescription="@string/person_photo"
+                app:layout_constraintBottom_toBottomOf="parent"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintHorizontal_bias="0.0"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@+id/toolbar2"
+                app:layout_constraintVertical_bias="0.0"
+                app:placeholderImage="@drawable/ic_person"
+                tools:srcCompat="@tools:sample/avatars" />
+
+            <TextView
+                android:id="@+id/name_label"
+                android:layout_width="255dp"
+                android:layout_height="26dp"
+                android:layout_marginTop="16dp"
+                android:layout_marginEnd="16dp"
+                app:layout_constraintBottom_toTopOf="@+id/date_label"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintTop_toBottomOf="@+id/photo"
+                app:nameString="@{person}" />
+
+            <TextView
+                android:id="@+id/date_label"
+                android:layout_width="255dp"
+                android:layout_height="26dp"
+                android:layout_marginTop="16dp"
+                android:layout_marginEnd="16dp"
+                app:dateString="@{person}"
+                app:layout_constraintBottom_toTopOf="@+id/phone_label"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintTop_toBottomOf="@+id/name_label" />
+
+            <TextView
+                android:id="@+id/textView"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="16dp"
+                android:text="@string/name_label"
+                app:layout_constraintEnd_toStartOf="@+id/name_label"
+                app:layout_constraintHorizontal_bias="0.0"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toTopOf="@+id/name_label" />
+
+            <TextView
+                android:id="@+id/textView2"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="16dp"
+                android:text="@string/date_label"
+                app:layout_constraintEnd_toStartOf="@+id/date_label"
+                app:layout_constraintHorizontal_bias="0.0"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toTopOf="@+id/date_label" />
+
+            <TextView
+                android:id="@+id/textView3"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="3dp"
+                android:text="@string/phone_label"
+                app:layout_constraintEnd_toStartOf="@+id/phone_label"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toTopOf="@+id/phone_label" />
+
+        </androidx.constraintlayout.widget.ConstraintLayout>
+</layout>

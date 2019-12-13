@@ -20,6 +20,10 @@ class PeopleShowViewModel (
 
     val navigateToPeopleEdit: LiveData<String>
         get() = _navigateToPeopleEdit
+    private val _navigateToPersonCard = MutableLiveData<String>()
+
+    val navigateToPersonCard: LiveData<String>
+        get() = _navigateToPersonCard
 
     private suspend fun insert(person: PersonBirthday) {
         withContext(Dispatchers.IO) {
@@ -111,6 +115,13 @@ class PeopleShowViewModel (
 
     fun onPersonClicked(id: String) {
         _navigateToPeopleEdit.value = id
+    }
+    fun onPersonCardClicked(id: String) {
+        _navigateToPersonCard.value = id
+    }
+
+    fun onPersonCardNavigated() {
+        _navigateToPersonCard.value = null
     }
 
     fun onPeopleEditNavigated() {
