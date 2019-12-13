@@ -3,10 +3,11 @@ package com.example.birthday_notifyer.peopleshow
 import android.Manifest
 import android.content.Context
 import android.content.pm.PackageManager
+import android.graphics.Color
+import android.graphics.PorterDuff
+import android.graphics.PorterDuffColorFilter
 import android.os.Bundle
-import android.os.Handler
 import android.provider.ContactsContract
-import android.util.Log
 import android.view.*
 import android.view.inputmethod.InputMethodManager
 import androidx.appcompat.app.AppCompatActivity
@@ -14,7 +15,6 @@ import androidx.appcompat.view.ActionMode
 import androidx.appcompat.widget.PopupMenu
 import androidx.appcompat.widget.SearchView
 import androidx.appcompat.widget.Toolbar
-import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat
 import androidx.databinding.DataBindingUtil
 import androidx.fragment.app.Fragment
@@ -31,8 +31,6 @@ import com.example.birthday_notifyer.R
 import com.example.birthday_notifyer.database.BirthdayDatabase
 import com.example.birthday_notifyer.database.PersonBirthday
 import com.example.birthday_notifyer.databinding.FragmentPeopleListBinding
-import com.google.android.material.snackbar.Snackbar
-import kotlinx.coroutines.delay
 import java.io.File
 import java.util.*
 
@@ -261,11 +259,19 @@ class PeopleShowFragment: Fragment() {
             if (actionMode != null) {
                 val edit = actionMode!!.menu.findItem(R.id.menu_edit)
                 edit.setEnabled(selectionSize == 1)
+                if (selectionSize == 1)
+                    edit.icon.colorFilter = PorterDuffColorFilter(Color.WHITE, PorterDuff.Mode.SRC_IN)
+                else
+                    edit.icon.colorFilter = PorterDuffColorFilter(Color.GRAY, PorterDuff.Mode.SRC_IN)
             }
         } else if (actionMode != null) {
             if (selectionSize > 0) {
                 val edit = actionMode!!.menu.findItem(R.id.menu_edit)
                 edit.setEnabled(selectionSize == 1)
+                if (selectionSize == 1)
+                    edit.icon.colorFilter = PorterDuffColorFilter(Color.WHITE, PorterDuff.Mode.SRC_IN)
+                else
+                    edit.icon.colorFilter = PorterDuffColorFilter(Color.GRAY, PorterDuff.Mode.SRC_IN)
                 actionMode!!.getMenu().findItem(R.id.menu_count).setTitle(
                     String.format(
                         Locale.US,
