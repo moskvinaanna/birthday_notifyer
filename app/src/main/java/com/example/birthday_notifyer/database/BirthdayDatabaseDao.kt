@@ -20,6 +20,8 @@ interface BirthdayDatabaseDao {
     fun clear()
     @Query("SELECT * FROM person_birthday_table ORDER BY personId DESC")
     fun getAllPeople(): LiveData<List<PersonBirthday>>
+    @Query("SELECT * FROM person_birthday_table WHERE birthday_date IS NOT NULL")
+    fun getPeopleList(): List<PersonBirthday>
     @Query("SELECT * FROM person_birthday_table WHERE name LIKE :name ORDER BY name ASC")
     fun getAllPeopleByNameAsc(name: String): LiveData<List<PersonBirthday>>
     @Query("SELECT * FROM person_birthday_table WHERE name LIKE :name ORDER BY name DESC")

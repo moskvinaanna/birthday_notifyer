@@ -29,7 +29,8 @@
             android:layout_height="match_parent"
             android:focusable="false"
             android:onClick="@{() -> clickListener.onClick(person)}"
-            android:orientation="vertical">
+            android:orientation="vertical"
+            android:visibility="visible">
 
             <TextView
                 android:id="@+id/phone_label"
@@ -75,6 +76,15 @@
                 app:layout_constraintBottom_toTopOf="@+id/phone_label"
                 app:layout_constraintStart_toEndOf="@+id/photo"
                 app:layout_constraintTop_toBottomOf="@+id/name_label" />
+
+            <ImageButton
+                android:id="@+id/imageButton"
+                android:layout_width="51dp"
+                android:layout_height="50dp"
+                android:visibility="gone"
+                app:layout_constraintBottom_toBottomOf="parent"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:srcCompat="@mipmap/ic_launcher" />
 
         </androidx.constraintlayout.widget.ConstraintLayout>
     </androidx.cardview.widget.CardView>

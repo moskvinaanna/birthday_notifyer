@@ -1,9 +1,14 @@
 package com.example.birthday_notifyer.peopleshow
 
+import android.app.PendingIntent
+import android.content.Intent
 import android.graphics.Color
 import android.net.Uri
+import android.opengl.Visibility
 import android.view.LayoutInflater
+import android.view.View
 import android.view.ViewGroup
+import androidx.core.content.ContextCompat.startActivity
 import androidx.recyclerview.selection.SelectionTracker
 import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.ListAdapter
@@ -12,6 +17,7 @@ import com.example.birthday_notifyer.database.PersonBirthday
 import com.example.birthday_notifyer.databinding.ListItemPersonBinding
 import com.facebook.drawee.view.SimpleDraweeView
 import java.io.File
+import java.util.*
 
 class PeopleShowAdapter(val clickListener: PersonBirthdayListener) : RecyclerView.Adapter<PeopleShowAdapter.PersonViewHolder>() {
     private var tracker: SelectionTracker<String>? = null
@@ -81,6 +87,22 @@ class PeopleShowAdapter(val clickListener: PersonBirthdayListener) : RecyclerVie
                 binding.cardView.setBackgroundColor(Color.LTGRAY)
             else
                 binding.cardView.setBackgroundColor(Color.WHITE)
+            binding.imageButton.visibility = View.GONE
+            binding.imageButton.setOnClickListener{
+                val intent = Intent(Intent.ACTION_DIAL)
+                intent.data = Uri.parse("tel:" + item.phoneNum)
+                it.context.startActivity(intent)
+            }
+            if (item.birthdayDate != null) {
+                val curDate: Calendar = Calendar.getInstance()
+                val personBirthdayDate: Calendar = Calendar.getInstance()
+                val day = curDate[Calendar.DAY_OF_MONTH]
+                val month = curDate[Calendar.MONTH]
+                personBirthdayDate.timeInMillis = item.birthdayDate!!
+                if (day == personBirthdayDate.get(Calendar.DAY_OF_MONTH) && month == personBirthdayDate.get(Calendar.MONTH)){
+                    binding.imageButton.visibility = View.VISIBLE
+                }
+            }
             binding.clickListener = clickListener
             binding.executePendingBindings()
             personItemDetail = PersonItemDetail(pos, item.personId)
@@ -103,18 +125,6 @@ class PeopleShowAdapter(val clickListener: PersonBirthdayListener) : RecyclerVie
         return items.count()
     }
 }
-
-
-//class PersonBirthdayDiffCallback : DiffUtil.ItemCallback<PersonBirthday>() {
-//
-//    override fun areItemsTheSame(oldItem: PersonBirthday, newItem: PersonBirthday): Boolean {
-//        return oldItem.personId == newItem.personId
-//    }
-//
-//    override fun areContentsTheSame(oldItem: PersonBirthday, newItem: PersonBirthday): Boolean {
-//        return oldItem == newItem
-//    }
-//}
 
 
 class PersonBirthdayListener(val clickListener: (personId: String) -> Unit) {
