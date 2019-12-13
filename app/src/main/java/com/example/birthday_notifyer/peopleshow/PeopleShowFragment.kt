@@ -120,23 +120,28 @@ class PeopleShowFragment: Fragment() {
     }
 
     private fun getContactList(): List<PersonBirthday>{
-        val cur = context!!.contentResolver
-            .query(
-                ContactsContract.CommonDataKinds.Phone.CONTENT_URI,
-                null,
-                null,
-                null,
-                null
-            )
+        val cursor = context!!.contentResolver.query(
+            ContactsContract.Contacts.CONTENT_URI, null, null,
+            null, null)
         var peopleList: MutableList<PersonBirthday> = mutableListOf()
-        while (cur != null && cur.moveToNext()) {
-            var person = PersonBirthday(personId = UUID.randomUUID().toString(),
-                name = cur.getString(cur.getColumnIndex(ContactsContract.CommonDataKinds.Phone.DISPLAY_NAME)),
-                phoneNum = cur.getString(cur.getColumnIndex(ContactsContract.CommonDataKinds.Phone.NUMBER)),
+        while (cursor?.moveToNext() == true) {
+            val name = cursor.getString(cursor.getColumnIndex((ContactsContract.Contacts.DISPLAY_NAME)))
+            val id = cursor.getString(cursor.getColumnIndex(ContactsContract.Contacts.NAME_RAW_CONTACT_ID))
+            val phonesCursor = context!!.contentResolver.query(ContactsContract.CommonDataKinds.Phone.CONTENT_URI,
+                null, ContactsContract.CommonDataKinds.Phone.CONTACT_ID + " = ?",
+                arrayOf(id), null)
+            while (phonesCursor?.moveToNext() == true){
+                val phoneNumber = phonesCursor.getString(
+                    phonesCursor.getColumnIndex(ContactsContract.CommonDataKinds.Phone.NUMBER))
+                var person = PersonBirthday(personId = UUID.randomUUID().toString(),
+                name = name,
+                phoneNum = phoneNumber,
                 birthdayDate = null)
-            peopleList.add(person)
+                peopleList.add(person)
+            }
+            phonesCursor?.close()
         }
-        cur!!.close()
+        cursor?.close()
         return peopleList
     }
 
