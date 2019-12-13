@@ -17,13 +17,13 @@ import android.widget.DatePicker
 import android.widget.TextView
 import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.app.AppCompatActivity
+import androidx.appcompat.widget.Toolbar
 import androidx.core.content.ContextCompat.getExternalFilesDirs
 import androidx.databinding.DataBindingUtil
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProviders
 import androidx.navigation.fragment.findNavController
-import androidx.navigation.ui.NavigationUI
 import com.example.birthday_notifyer.R
 import com.example.birthday_notifyer.database.BirthdayDatabase
 import com.example.birthday_notifyer.database.PersonBirthday
@@ -43,12 +43,14 @@ import java.util.*
 
 
 class PeopleEditFragment: Fragment() {
+    private var toolbar: Toolbar? = null
     private val viewModelJob = Job()
     private val uiScope = CoroutineScope(Dispatchers.Main + viewModelJob)
     private var photoUri: Uri? = null
     private var photo: SimpleDraweeView? = null
     private var dateTextView: TextView? = null
     private var cal = Calendar.getInstance()
+    private var peopleEditViewModel: PeopleEditViewModel? = null
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?,
                               savedInstanceState: Bundle?): View? {
@@ -63,14 +65,19 @@ class PeopleEditFragment: Fragment() {
         val dataSource = BirthdayDatabase.getInstance(application).birthdayDatabaseDao
         val viewModelFactory = PeopleEditViewModelFactory(arguments.personKey, dataSource)
 
-        val peopleEditViewModel =
+        peopleEditViewModel =
             ViewModelProviders.of(
                 this, viewModelFactory).get(PeopleEditViewModel::class.java)
         var person: PersonBirthday? = null
+        toolbar = binding.toolbar2
+        if(activity is AppCompatActivity){
+            (activity as AppCompatActivity).setSupportActionBar(toolbar)
+        }
+        (activity as AppCompatActivity).supportActionBar?.setDisplayHomeAsUpEnabled(true)
         photo = binding.photoView
         if (arguments.personKey != ""){
                uiScope.launch {
-                   person = peopleEditViewModel.getPersonFromDataBase()
+                   person = peopleEditViewModel!!.getPersonFromDataBase()
                    binding.nameEdit.setText(person!!.name)
                    binding.phoneEdit.setText(person!!.phoneNum)
                    if (person!!.birthdayDate != null) {
@@ -109,7 +116,6 @@ class PeopleEditFragment: Fragment() {
                     .show()
             } else selectFile()
         }
-
 
 
         // To use the View Model with data binding, you have to explicitly
@@ -161,13 +167,13 @@ class PeopleEditFragment: Fragment() {
                     if (file.exists()) file.delete()
                 }
                 if (dateTextView!!.text.toString() == "") {
-                    peopleEditViewModel.onSave(
+                    peopleEditViewModel!!.onSave(
                         UUID.randomUUID().toString(), binding.nameEdit.text.toString(),
                         binding.phoneEdit.text.toString(), null, filePath
 
                     )
                 } else {
-                    peopleEditViewModel.onSave(
+                    peopleEditViewModel!!.onSave(
                         UUID.randomUUID().toString(), binding.nameEdit.text.toString(),
                         binding.phoneEdit.text.toString(), cal.timeInMillis, filePath
 
@@ -181,11 +187,11 @@ class PeopleEditFragment: Fragment() {
         }
 
         // Add an Observer to the state variable for Navigating when a Quality icon is tapped.
-        peopleEditViewModel.navigateToPeopleShow.observe(viewLifecycleOwner, Observer {
+        peopleEditViewModel!!.navigateToPeopleShow.observe(viewLifecycleOwner, Observer {
             if (it == true) {
                 this.findNavController().navigate(
                     PeopleEditFragmentDirections.actionPeopleEditFragmentToPeopleListFragment())
-                peopleEditViewModel.doneNavigating()
+                peopleEditViewModel!!.doneNavigating()
             }
         })
         val dateSetListener = object : DatePickerDialog.OnDateSetListener {
@@ -211,7 +217,17 @@ class PeopleEditFragment: Fragment() {
             }
 
         })
+        setHasOptionsMenu(true)
         return binding.root
+    }
+
+    override fun onOptionsItemSelected(item: MenuItem): Boolean {
+        when (item.itemId) {
+            android.R.id.home -> {
+                peopleEditViewModel!!.onCancel()
+            }
+        }
+        return super.onOptionsItemSelected(item)
     }
 
     private fun updateDateInView() {
