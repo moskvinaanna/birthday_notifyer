@@ -45,7 +45,7 @@ class NotificationWorker(
                             val pendingIntent = PendingIntent.getActivity(
                                 applicationContext,
                                 0,
-                                Intent(Intent.ACTION_DIAL),
+                                intent,
                                 PendingIntent.FLAG_CANCEL_CURRENT
                             )
 

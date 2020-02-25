@@ -88,7 +88,7 @@ class PersonCardFragment: Fragment() {
                 binding.dateLabel.setText(format.format(date))
             }
             else
-                binding.dateLabel.setText("Не установлена")
+                binding.dateLabel.setText(R.string.not_set)
             if (person!!.photo != ""){
                 photoUri = Uri.fromFile(File(person!!.photo))
                 photo!!.setImageURI(photoUri, null)

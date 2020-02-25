@@ -55,7 +55,7 @@ class PeopleEditFragment: Fragment() {
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?,
                               savedInstanceState: Bundle?): View? {
 
-        // Get a reference to the binding object and inflate the fragment views.
+
         val binding: FragmentPersonEditBinding = DataBindingUtil.inflate(
             inflater, R.layout.fragment_person_edit, container, false)
 
@@ -101,12 +101,12 @@ class PeopleEditFragment: Fragment() {
         binding.photoView.setOnClickListener{ v: View? ->
             if (photoUri != null) {
                 AlertDialog.Builder(activity as AppCompatActivity)
-                    .setTitle("Выберите действие")
+                    .setTitle(R.string.select_an_action)
                     .setPositiveButton(
-                        "Изменить"
+                        R.string.change
                     ) { _: DialogInterface?, _: Int -> selectFile() }
                     .setNegativeButton(
-                        "Удалить"
+                        R.string.remove
                     ) { _: DialogInterface?, _: Int ->
                         val imagePipeline = Fresco.getImagePipeline()
                         imagePipeline.evictFromCache(photoUri)
@@ -117,19 +117,16 @@ class PeopleEditFragment: Fragment() {
             } else selectFile()
         }
 
-
-        // To use the View Model with data binding, you have to explicitly
-        // give the binding object a reference to it.
         binding.peopleEditViewModel = peopleEditViewModel
 
         binding.saveButton.setOnClickListener{
             if (binding.nameEdit.text!!.isEmpty() || binding.phoneEdit.text!!.isEmpty() || binding.dateEdit.text!!.isEmpty()) {
                 if (binding.nameEdit.text!!.isEmpty())
-                    binding.nameEdit.error = "Введите имя"
+                    binding.nameEdit.error = R.string.name_error.toString()
                 if (binding.phoneEdit.text!!.isEmpty())
-                    binding.phoneEdit.error = "Введите номер телефона"
+                    binding.phoneEdit.error = R.string.phone_error.toString()
                 if (binding.dateEdit.text!!.isEmpty())
-                    binding.dateEdit.error = "Введите дату рождения"
+                    binding.dateEdit.error = R.string.date_error.toString()
             }
             else {
                 var filePath: String = ""
@@ -231,7 +228,7 @@ class PeopleEditFragment: Fragment() {
     }
 
     private fun updateDateInView() {
-        val myFormat = "dd.MM.yyyy" // mention the format you need
+        val myFormat = "dd.MM.yyyy"
         val sdf = SimpleDateFormat(myFormat, Locale.US)
         dateTextView!!.text = sdf.format(cal.getTime())
     }
@@ -255,7 +252,7 @@ class PeopleEditFragment: Fragment() {
         intent.type = "image/*"
         intent.addCategory(Intent.CATEGORY_OPENABLE)
         startActivityForResult(
-            Intent.createChooser(intent, "Выберите изображение"),
+            Intent.createChooser(intent, getString(R.string.select_a_picture)),
             3
         )
     }

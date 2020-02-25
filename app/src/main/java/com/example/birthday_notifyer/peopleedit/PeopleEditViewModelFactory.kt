@@ -13,6 +13,6 @@ class PeopleEditViewModelFactory(
         if (modelClass.isAssignableFrom(PeopleEditViewModel::class.java)) {
             return PeopleEditViewModel(personKey, dataSource) as T
         }
-        throw IllegalArgumentException("Unknown ViewModel class")
+        throw IllegalArgumentException()
     }
 }

@@ -15,15 +15,13 @@ import java.util.concurrent.TimeUnit
 
 class MainActivity : AppCompatActivity() {
 
-    private var toolbar: Toolbar? = null
-
     override fun onCreate(savedInstanceState: Bundle?) {
         Fresco.initialize(this)
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
             val channel = NotificationChannel(
-                "periodic_notification_channel_id",
+                R.string.channel.toString(),
                 "Дни рождения", NotificationManager.IMPORTANCE_DEFAULT
             )
             channel.description = "Отправляет уведомления"
@@ -39,10 +37,9 @@ class MainActivity : AppCompatActivity() {
         ).build()
 
         workManager.enqueueUniquePeriodicWork(
-            "periodic_notification_channel_id",
+            R.string.channel.toString(),
             ExistingPeriodicWorkPolicy.REPLACE,
             request
         )
-        //setSupportActionBar(toolbar)
     }
 }

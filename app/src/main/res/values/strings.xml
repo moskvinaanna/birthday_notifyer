@@ -16,9 +16,6 @@
     <string name="edit">Редактировать</string>
     <string name="remove">Удалить</string>
     <string name="select_all">Выбрать все</string>
-
-    <!-- TODO: Remove or change this placeholder text -->
-    <string name="hello_blank_fragment">Hello blank fragment</string>
     <string name="sort_by_name_asc">По имени (по возрастанию)</string>
     <string name="sort_by_name_desc">По имени (по убыванию)</string>
     <string name="sort_by_date_asc">Сортировать по дате (по возрастанию)</string>
@@ -28,4 +25,12 @@
     <string name="phone_material">Номер телефона</string>
     <string name="add_manually">Добавить вручную</string>
     <string name="add_from_contacts">Добавить из контактов</string>
+    <string name="select_a_picture">Выберите изображение</string>
+    <string name="select_an_action">Выберите действие</string>
+    <string name="change">Изменить</string>
+    <string name="name_error">Введите имя</string>
+    <string name="phone_error">Введите номер телефона</string>
+    <string name="date_error">Введите дату рождения</string>
+    <string name="not_set">Не установлена</string>
+    <string name="channel">periodic_notification_channel_id</string>
 </resources>
