@@ -33,4 +33,7 @@
     <string name="date_error">Введите дату рождения</string>
     <string name="not_set">Не установлена</string>
     <string name="channel">periodic_notification_channel_id</string>
+    <string name="description">Отправляет уведомления</string>
+    <string name="birthday">День Рождения у </string>
+    <string name="congratulate">Поздравить</string>
 </resources>

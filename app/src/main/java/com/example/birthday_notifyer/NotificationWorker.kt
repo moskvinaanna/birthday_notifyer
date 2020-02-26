@@ -52,15 +52,15 @@ class NotificationWorker(
                             val notification =
                                 NotificationCompat.Builder(
                                     context,
-                                    "periodic_notification_channel_id"
+                                    R.string.channel.toString()
                                 )
-                                    .setContentTitle("День Рождения!!")
-                                    .setContentText("День Рождения у " + person.name)
+                                    .setContentTitle(R.string.app_name.toString())
+                                    .setContentText(R.string.birthday.toString() + person.name)
                                     .setCategory(NotificationCompat.CATEGORY_EVENT)
                                     .setSmallIcon(R.mipmap.ic_launcher_foreground)
                                     .addAction(
                                         android.R.drawable.ic_menu_call,
-                                        "Поздравить",
+                                        R.string.congratulate.toString(),
                                         pendingIntent
                                     )
                                     .build()

@@ -22,9 +22,9 @@ class MainActivity : AppCompatActivity() {
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
             val channel = NotificationChannel(
                 R.string.channel.toString(),
-                "Дни рождения", NotificationManager.IMPORTANCE_DEFAULT
+                R.string.app_name.toString(), NotificationManager.IMPORTANCE_DEFAULT
             )
-            channel.description = "Отправляет уведомления"
+            channel.description = R.string.description.toString()
             val notificationManager =
                 NotificationManagerCompat.from(this)
             notificationManager.createNotificationChannel(channel)
