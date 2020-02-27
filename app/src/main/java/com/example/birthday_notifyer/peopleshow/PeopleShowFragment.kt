@@ -40,7 +40,6 @@ class PeopleShowFragment: Fragment() {
     private var tracker: SelectionTracker<String>? = null
     private var adapter: PeopleShowAdapter? = null
     private var actionMode: ActionMode? = null
-    private var popupMenu: PopupMenu? = null
     private var recyclerView: RecyclerView? = null
     private var isSortByName: Boolean = true
     private var isSortAsc: Boolean = true
@@ -50,12 +49,8 @@ class PeopleShowFragment: Fragment() {
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?,
                               savedInstanceState: Bundle?): View? {
         val application = requireNotNull(this.activity).application
-
-        // Create an instance of the ViewModel Factory.
         val dataSource = BirthdayDatabase.getInstance(application).birthdayDatabaseDao
         val viewModelFactory = PeopleShowViewModelFactory(dataSource, application)
-
-        // Get a reference to the ViewModel associated with this fragment.
         val peopleShowViewModel =
             ViewModelProviders.of(
                 this, viewModelFactory).get(PeopleShowViewModel::class.java)
@@ -79,7 +74,6 @@ class PeopleShowFragment: Fragment() {
         adapter = PeopleShowAdapter(PersonBirthdayListener { personId ->
             peopleShowViewModel.onPersonCardClicked(personId)
         })
-        //this.adapter = adapter
         recyclerView = binding.peopleList
         recyclerView!!.adapter = adapter
         tracker = SelectionTracker.Builder(
@@ -89,7 +83,7 @@ class PeopleShowFragment: Fragment() {
             PersonItemLookup(recyclerView!!),
             StorageStrategy.createStringStorage()
         ).build()
-        recyclerView!!.setItemAnimator(null)
+        recyclerView!!.setItemAnimator(null) //исправляет проблему с RecyclerView
 
         adapter!!.setTracker(tracker!!)
         tracker!!.addObserver(object : SelectionTracker.SelectionObserver<String>() {
@@ -97,25 +91,28 @@ class PeopleShowFragment: Fragment() {
                 toggleActionMode()
             }
         })
-        //binding.setLifecycleOwner(this)
         getDataFromViewModel()
-        peopleShowViewModel.navigateToPeopleEdit.observe(viewLifecycleOwner,
+        navigationObservers()
+        return binding.root
+    }
+
+    private fun navigationObservers(){
+        viewModel!!.navigateToPeopleEdit.observe(viewLifecycleOwner,
             Observer {person ->
                 person?.let{
                     this.findNavController().navigate(PeopleShowFragmentDirections.
                         actionPeopleListFragmentToPeopleEditFragment(person))
-                    peopleShowViewModel.onPeopleEditNavigated()
+                    viewModel!!.onPeopleEditNavigated()
                 }
             })
-        peopleShowViewModel.navigateToPersonCard.observe(viewLifecycleOwner,
+        viewModel!!.navigateToPersonCard.observe(viewLifecycleOwner,
             Observer {person ->
                 person?.let{
                     this.findNavController().navigate(PeopleShowFragmentDirections.
                         actionPeopleListFragmentToPersonCardFragment(person))
-                    peopleShowViewModel.onPersonCardNavigated()
+                    viewModel!!.onPersonCardNavigated()
                 }
             })
-        return binding.root
     }
 
     private fun getContactList(): List<PersonBirthday>{
@@ -286,13 +283,9 @@ class PeopleShowFragment: Fragment() {
                                             permissions: Array<String>, grantResults: IntArray) {
         when (requestCode) {
             1 -> {
-                // If request is cancelled, the result arrays are empty.
                 if ((grantResults.isNotEmpty() && grantResults[0] == PackageManager.PERMISSION_GRANTED)) {
                     val list: List<PersonBirthday> = getContactList()
                     viewModel!!.addPeople(list)
-                } else {
-                    // permission denied, boo! Disable the
-                    // functionality that depends on this permission.
                 }
                 return
             }

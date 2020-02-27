@@ -129,7 +129,7 @@ class PeopleEditFragment: Fragment() {
     }
 
     private fun onSave(binding: FragmentPersonEditBinding, person: PersonBirthday?){
-        if (binding.nameEdit.text!!.isEmpty() || binding.phoneEdit.text!!.isEmpty() || binding.dateEdit.text!!.isEmpty()) {
+        if (binding.nameEdit.text!!.isEmpty() || binding.phoneEdit.text!!.isEmpty() || binding.dateEdit.text!!.isEmpty() || Date(cal.timeInMillis).after(Date())) {
             setErrorMessages(binding)
         }
         else {
@@ -161,6 +161,9 @@ class PeopleEditFragment: Fragment() {
             binding.phoneEdit.error = getString(R.string.phone_error)
         if (binding.dateEdit.text!!.isEmpty())
             binding.dateEdit.error = getString(R.string.date_error)
+        else
+            if (Date(cal.timeInMillis).after(Date()))
+                binding.dateEdit.error = "Выбрана дата из будущего"
     }
 
     private fun setNewPhoto(person: PersonBirthday?): String{
@@ -221,15 +224,15 @@ class PeopleEditFragment: Fragment() {
     }
 
     private fun setFields(person: PersonBirthday, binding: FragmentPersonEditBinding){
-        binding.nameEdit.setText(person!!.name)
-        binding.phoneEdit.setText(person!!.phoneNum)
-        if (person!!.birthdayDate != null) {
-            val date = Date(person!!.birthdayDate!!)
+        binding.nameEdit.setText(person.name)
+        binding.phoneEdit.setText(person.phoneNum)
+        if (person.birthdayDate != null) {
+            val date = Date(person.birthdayDate!!)
             val format = SimpleDateFormat("dd.MM.yyyy")
             binding.dateEdit.setText(format.format(date))
         }
-        if (person!!.photo != ""){
-            photoUri = Uri.fromFile(File(person!!.photo))
+        if (person.photo != ""){
+            photoUri = Uri.fromFile(File(person.photo))
             photo!!.setImageURI(photoUri, null)
         }
     }

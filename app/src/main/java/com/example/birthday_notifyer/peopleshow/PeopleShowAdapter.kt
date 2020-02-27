@@ -28,7 +28,7 @@ class PeopleShowAdapter(val clickListener: PersonBirthdayListener) : RecyclerVie
     }
 
     override fun getItemId(position: Int): Long {
-        return (position).toLong()
+        return items[position].personId.hashCode().toLong()
     }
 
     override fun getItemViewType(position: Int): Int {

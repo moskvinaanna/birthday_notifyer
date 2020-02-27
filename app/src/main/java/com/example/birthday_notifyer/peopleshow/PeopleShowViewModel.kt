@@ -25,12 +25,6 @@ class PeopleShowViewModel (
     val navigateToPersonCard: LiveData<String>
         get() = _navigateToPersonCard
 
-    private suspend fun insert(person: PersonBirthday) {
-        withContext(Dispatchers.IO) {
-            database.insert(person)
-        }
-    }
-
     private suspend fun insertAll(people: List<PersonBirthday>) {
         withContext(Dispatchers.IO) {
             database.insertAll(people)
@@ -55,28 +49,10 @@ class PeopleShowViewModel (
         }
     }
 
-    fun addPerson(person:PersonBirthday){
-        uiScope.launch { insert(person) }
-    }
-
     fun addPeople(people: List<PersonBirthday>){
         uiScope.launch {
-//            for (person in people) {
-//                insert(person)
-//            }
             insertAll(people)
         }
-    }
-
-    fun onClear() {
-        uiScope.launch {
-            // Clear the database table.
-            clear()
-        }
-    }
-
-    fun onSearchPeople(name: String){
-        people = database.getAllPeopleByNameAsc("%"+name+"%")
     }
 
     fun onSortByNameAsc(name: String){
@@ -94,12 +70,6 @@ class PeopleShowViewModel (
     fun onSortByDateDesc(name: String){
         people =  database.getAllPeopleByDateDesc("%"+name+"%")
     }
-
-//        uiScope.launch {
-//            withContext(Dispatchers.IO){
-//                database.getAllPeopleByNameDesc()
-//            }
-//        }
 
     fun onRemove(idList: List<String>){
         uiScope.launch{

@@ -36,14 +36,11 @@ class PersonCardFragment: Fragment() {
     private val uiScope = CoroutineScope(Dispatchers.Main + viewModelJob)
     private var photoUri: Uri? = null
     private var photo: SimpleDraweeView? = null
-    private var dateTextView: TextView? = null
-    private var cal = Calendar.getInstance()
     private var personCardViewModel: PeopleEditViewModel? = null
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?,
                               savedInstanceState: Bundle?): View? {
 
-        // Get a reference to the binding object and inflate the fragment views.
         val binding: FragmentPersonCardBinding = DataBindingUtil.inflate(
             inflater, R.layout.fragment_person_card, container, false)
 
@@ -65,19 +62,7 @@ class PersonCardFragment: Fragment() {
         photo = binding.photo
         uiScope.launch {
             person = personCardViewModel!!.getPersonFromDataBase()
-            binding.nameLabel.setText(person!!.name)
-            binding.phoneLabel.setText(person!!.phoneNum)
-            if (person!!.birthdayDate != null) {
-                val date = Date(person!!.birthdayDate!!)
-                val format = SimpleDateFormat("dd.MM.yyyy")
-                binding.dateLabel.setText(format.format(date))
-            }
-            else
-                binding.dateLabel.setText(R.string.not_set)
-            if (person!!.photo != ""){
-                photoUri = Uri.fromFile(File(person!!.photo))
-                photo!!.setImageURI(photoUri, null)
-            }
+            setLabels(person!!, binding)
         }
 
         if (person != null && person!!.photo != ""){
@@ -87,6 +72,22 @@ class PersonCardFragment: Fragment() {
 
         setHasOptionsMenu(true)
         return binding.root
+    }
+
+    private fun setLabels(person: PersonBirthday, binding: FragmentPersonCardBinding){
+        binding.nameLabel.setText(person!!.name)
+        binding.phoneLabel.setText(person!!.phoneNum)
+        if (person!!.birthdayDate != null) {
+            val date = Date(person!!.birthdayDate!!)
+            val format = SimpleDateFormat("dd.MM.yyyy")
+            binding.dateLabel.setText(format.format(date))
+        }
+        else
+            binding.dateLabel.setText(R.string.not_set)
+        if (person!!.photo != ""){
+            photoUri = Uri.fromFile(File(person!!.photo))
+            photo!!.setImageURI(photoUri, null)
+        }
     }
 
     override fun onOptionsItemSelected(item: MenuItem): Boolean {
