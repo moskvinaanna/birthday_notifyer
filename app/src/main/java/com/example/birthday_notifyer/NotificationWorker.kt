@@ -1,9 +1,9 @@
 package com.example.birthday_notifyer
 
+import android.app.Notification
 import android.app.PendingIntent
 import android.content.Context
 import android.content.Intent
-import android.graphics.BitmapFactory
 import android.net.Uri
 import androidx.core.app.NotificationCompat
 import androidx.core.app.NotificationManagerCompat
@@ -49,21 +49,7 @@ class NotificationWorker(
                                 PendingIntent.FLAG_CANCEL_CURRENT
                             )
 
-                            val notification =
-                                NotificationCompat.Builder(
-                                    context,
-                                    R.string.channel.toString()
-                                )
-                                    .setContentTitle(R.string.app_name.toString())
-                                    .setContentText(R.string.birthday.toString() + person.name)
-                                    .setCategory(NotificationCompat.CATEGORY_EVENT)
-                                    .setSmallIcon(R.mipmap.ic_launcher_foreground)
-                                    .addAction(
-                                        android.R.drawable.ic_menu_call,
-                                        R.string.congratulate.toString(),
-                                        pendingIntent
-                                    )
-                                    .build()
+                            val notification = createNotif(pendingIntent, person)
 
 
                             val notificationManager =
@@ -81,12 +67,22 @@ class NotificationWorker(
         return Result.success()
     }
 
-    private fun getAllPeople(database: BirthdayDatabase){
-        uiScope.launch {
-            withContext(Dispatchers.IO){
-                people = database.birthdayDatabaseDao.getPeopleList()
-            }
-        }
+    private fun createNotif(pendingIntent: PendingIntent, person:PersonBirthday): Notification {
+
+        return NotificationCompat.Builder(
+            applicationContext,
+            applicationContext.getString(R.string.channel)
+        )
+            .setContentTitle(applicationContext.getString(R.string.app_name))
+            .setContentText(applicationContext.getString(R.string.birthday) + " " + person.name)
+            .setCategory(NotificationCompat.CATEGORY_EVENT)
+            .setSmallIcon(R.mipmap.ic_launcher_foreground)
+            .addAction(
+                android.R.drawable.ic_menu_call,
+                applicationContext.getString(R.string.congratulate),
+                pendingIntent
+            )
+            .build()
     }
 }
 

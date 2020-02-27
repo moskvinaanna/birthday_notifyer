@@ -21,10 +21,10 @@ class MainActivity : AppCompatActivity() {
         setContentView(R.layout.activity_main)
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
             val channel = NotificationChannel(
-                R.string.channel.toString(),
-                R.string.app_name.toString(), NotificationManager.IMPORTANCE_DEFAULT
+                applicationContext.getString(R.string.channel),
+                applicationContext.getString(R.string.app_name), NotificationManager.IMPORTANCE_DEFAULT
             )
-            channel.description = R.string.description.toString()
+            channel.description = applicationContext.getString(R.string.description)
             val notificationManager =
                 NotificationManagerCompat.from(this)
             notificationManager.createNotificationChannel(channel)
@@ -37,7 +37,7 @@ class MainActivity : AppCompatActivity() {
         ).build()
 
         workManager.enqueueUniquePeriodicWork(
-            R.string.channel.toString(),
+            applicationContext.getString(R.string.channel),
             ExistingPeriodicWorkPolicy.REPLACE,
             request
         )

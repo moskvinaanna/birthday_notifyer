@@ -122,11 +122,11 @@ class PeopleEditFragment: Fragment() {
         binding.saveButton.setOnClickListener{
             if (binding.nameEdit.text!!.isEmpty() || binding.phoneEdit.text!!.isEmpty() || binding.dateEdit.text!!.isEmpty()) {
                 if (binding.nameEdit.text!!.isEmpty())
-                    binding.nameEdit.error = R.string.name_error.toString()
+                    binding.nameEdit.error = getString(R.string.name_error)
                 if (binding.phoneEdit.text!!.isEmpty())
-                    binding.phoneEdit.error = R.string.phone_error.toString()
+                    binding.phoneEdit.error = getString(R.string.phone_error)
                 if (binding.dateEdit.text!!.isEmpty())
-                    binding.dateEdit.error = R.string.date_error.toString()
+                    binding.dateEdit.error = getString(R.string.date_error)
             }
             else {
                 var filePath: String = ""
