@@ -1,9 +1,6 @@
 package com.example.birthday_notifyer.personcard
 
 import android.app.Activity
-import android.app.DatePickerDialog
-import android.content.Context
-import android.content.DialogInterface
 import android.content.Intent
 import android.net.Uri
 import android.os.Bundle
@@ -11,37 +8,25 @@ import android.view.LayoutInflater
 import android.view.MenuItem
 import android.view.View
 import android.view.ViewGroup
-import android.view.inputmethod.InputMethodManager
-import android.widget.DatePicker
 import android.widget.TextView
-import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.app.AppCompatActivity
 import androidx.appcompat.widget.Toolbar
-import androidx.core.content.ContextCompat
 import androidx.databinding.DataBindingUtil
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.ViewModelProviders
-import androidx.lifecycle.observe
-import androidx.navigation.fragment.findNavController
 import com.example.birthday_notifyer.R
 import com.example.birthday_notifyer.database.BirthdayDatabase
 import com.example.birthday_notifyer.database.PersonBirthday
 import com.example.birthday_notifyer.databinding.FragmentPersonCardBinding
-import com.example.birthday_notifyer.databinding.FragmentPersonEditBinding
 import com.example.birthday_notifyer.peopleedit.PeopleEditFragmentArgs
-import com.example.birthday_notifyer.peopleedit.PeopleEditFragmentDirections
 import com.example.birthday_notifyer.peopleedit.PeopleEditViewModel
 import com.example.birthday_notifyer.peopleedit.PeopleEditViewModelFactory
-import com.facebook.drawee.backends.pipeline.Fresco
 import com.facebook.drawee.view.SimpleDraweeView
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.launch
 import java.io.File
-import java.io.FileOutputStream
-import java.io.InputStream
-import java.io.OutputStream
 import java.text.SimpleDateFormat
 import java.util.*
 

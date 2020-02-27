@@ -7,7 +7,6 @@ import android.content.DialogInterface
 import android.content.Intent
 import android.net.Uri
 import android.os.Bundle
-import android.util.Log
 import android.view.LayoutInflater
 import android.view.MenuItem
 import android.view.View
@@ -54,17 +53,12 @@ class PeopleEditFragment: Fragment() {
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?,
                               savedInstanceState: Bundle?): View? {
-
-
         val binding: FragmentPersonEditBinding = DataBindingUtil.inflate(
             inflater, R.layout.fragment_person_edit, container, false)
-
         val application = requireNotNull(this.activity).application
         val arguments = PeopleEditFragmentArgs.fromBundle(arguments!!)
-
         val dataSource = BirthdayDatabase.getInstance(application).birthdayDatabaseDao
         val viewModelFactory = PeopleEditViewModelFactory(arguments.personKey, dataSource)
-
         peopleEditViewModel =
             ViewModelProviders.of(
                 this, viewModelFactory).get(PeopleEditViewModel::class.java)
@@ -78,19 +72,8 @@ class PeopleEditFragment: Fragment() {
         if (arguments.personKey != ""){
                uiScope.launch {
                    person = peopleEditViewModel!!.getPersonFromDataBase()
-                   binding.nameEdit.setText(person!!.name)
-                   binding.phoneEdit.setText(person!!.phoneNum)
-                   if (person!!.birthdayDate != null) {
-                       val date = Date(person!!.birthdayDate!!)
-                       val format = SimpleDateFormat("dd.MM.yyyy")
-                       binding.dateEdit.setText(format.format(date))
-                   }
-                   if (person!!.photo != ""){
-                       photoUri = Uri.fromFile(File(person!!.photo))
-                       photo!!.setImageURI(photoUri, null)
-                   }
+                   setFields(person!!, binding)
                }
-
         }
 
         if (person != null && person!!.photo != ""){
@@ -98,92 +81,10 @@ class PeopleEditFragment: Fragment() {
             photo!!.setImageURI(photoUri, null)
         }
 
-        binding.photoView.setOnClickListener{ v: View? ->
-            if (photoUri != null) {
-                AlertDialog.Builder(activity as AppCompatActivity)
-                    .setTitle(R.string.select_an_action)
-                    .setPositiveButton(
-                        R.string.change
-                    ) { _: DialogInterface?, _: Int -> selectFile() }
-                    .setNegativeButton(
-                        R.string.remove
-                    ) { _: DialogInterface?, _: Int ->
-                        val imagePipeline = Fresco.getImagePipeline()
-                        imagePipeline.evictFromCache(photoUri)
-                        photo!!.setImageURI(Uri.EMPTY, null)
-                        photoUri = null
-                    }
-                    .show()
-            } else selectFile()
-        }
+        setClickListeners(binding, person)
 
         binding.peopleEditViewModel = peopleEditViewModel
 
-        binding.saveButton.setOnClickListener{
-            if (binding.nameEdit.text!!.isEmpty() || binding.phoneEdit.text!!.isEmpty() || binding.dateEdit.text!!.isEmpty()) {
-                if (binding.nameEdit.text!!.isEmpty())
-                    binding.nameEdit.error = getString(R.string.name_error)
-                if (binding.phoneEdit.text!!.isEmpty())
-                    binding.phoneEdit.error = getString(R.string.phone_error)
-                if (binding.dateEdit.text!!.isEmpty())
-                    binding.dateEdit.error = getString(R.string.date_error)
-            }
-            else {
-                var filePath: String = ""
-                var personId: String = UUID.randomUUID().toString()
-                if (person != null)
-                    personId = person!!.personId
-                if (photoUri != null) {
-                    filePath = getExternalFilesDirs(
-                        (activity as AppCompatActivity),
-                        null
-                    ).get(0).getAbsolutePath() + "/" + personId
-                    try {
-                        if (photoUri!!.lastPathSegment != personId.toString()) {
-                            val outFile = File(filePath)
-                            val inputStream: InputStream? =
-                                (activity as AppCompatActivity).getContentResolver()
-                                    .openInputStream(photoUri!!)
-                            val os: OutputStream = FileOutputStream(outFile)
-                            val buffer = ByteArray(4096)
-                            while (inputStream!!.read(buffer) != -1) os.write(buffer)
-                            inputStream!!.close()
-                            os.close()
-                            val imagePipeline = Fresco.getImagePipeline()
-                            imagePipeline.evictFromCache(Uri.fromFile(outFile))
-                        }
-                    } catch (e: Exception) {
-                    }
-                } else if (person != null) {
-                    val p: String =
-                        getExternalFilesDirs(
-                            (activity as AppCompatActivity),
-                            null
-                        ).get(0).getAbsolutePath() + "/" + person!!.personId.toString()
-                    val file = File(p)
-                    if (file.exists()) file.delete()
-                }
-                if (dateTextView!!.text.toString() == "") {
-                    peopleEditViewModel!!.onSave(
-                        UUID.randomUUID().toString(), binding.nameEdit.text.toString(),
-                        binding.phoneEdit.text.toString(), null, filePath
-
-                    )
-                } else {
-                    peopleEditViewModel!!.onSave(
-                        UUID.randomUUID().toString(), binding.nameEdit.text.toString(),
-                        binding.phoneEdit.text.toString(), cal.timeInMillis, filePath
-
-                    )
-
-                }
-                val inputMethodManager =
-                    this.context?.getSystemService(Context.INPUT_METHOD_SERVICE) as InputMethodManager
-                inputMethodManager.hideSoftInputFromWindow(binding.phoneEdit.windowToken, 0)
-            }
-        }
-
-        // Add an Observer to the state variable for Navigating when a Quality icon is tapped.
         peopleEditViewModel!!.navigateToPeopleShow.observe(viewLifecycleOwner, Observer {
             if (it == true) {
                 this.findNavController().navigate(
@@ -191,6 +92,19 @@ class PeopleEditFragment: Fragment() {
                 peopleEditViewModel!!.doneNavigating()
             }
         })
+        setHasOptionsMenu(true)
+        return binding.root
+    }
+
+    private fun setClickListeners(binding: FragmentPersonEditBinding, person: PersonBirthday?){
+        binding.photoView.setOnClickListener{ v: View? ->
+            setPhoto()
+        }
+
+        binding.saveButton.setOnClickListener{
+            onSave(binding, person)
+        }
+
         val dateSetListener = object : DatePickerDialog.OnDateSetListener {
             override fun onDateSet(view: DatePicker, year: Int, monthOfYear: Int,
                                    dayOfMonth: Int) {
@@ -202,20 +116,122 @@ class PeopleEditFragment: Fragment() {
         }
         dateTextView = binding.dateEdit
 
-        // when you click on the button, show DatePickerDialog that is set with OnDateSetListener
         dateTextView!!.setOnClickListener(object : View.OnClickListener {
             override fun onClick(view: View) {
                 DatePickerDialog(activity as AppCompatActivity,
                     dateSetListener,
-                    // set DatePickerDialog to point to today's date when it loads up
                     cal.get(Calendar.YEAR),
                     cal.get(Calendar.MONTH),
                     cal.get(Calendar.DAY_OF_MONTH)).show()
             }
 
         })
-        setHasOptionsMenu(true)
-        return binding.root
+    }
+
+    private fun onSave(binding: FragmentPersonEditBinding, person: PersonBirthday?){
+        if (binding.nameEdit.text!!.isEmpty() || binding.phoneEdit.text!!.isEmpty() || binding.dateEdit.text!!.isEmpty()) {
+            setErrorMessages(binding)
+        }
+        else {
+            var filePath = setNewPhoto(person)
+            if (dateTextView!!.text.toString() == "") {
+                peopleEditViewModel!!.onSave(
+                    UUID.randomUUID().toString(), binding.nameEdit.text.toString(),
+                    binding.phoneEdit.text.toString(), null, filePath
+
+                )
+            } else {
+                peopleEditViewModel!!.onSave(
+                    UUID.randomUUID().toString(), binding.nameEdit.text.toString(),
+                    binding.phoneEdit.text.toString(), cal.timeInMillis, filePath
+
+                )
+
+            }
+            val inputMethodManager =
+                this.context?.getSystemService(Context.INPUT_METHOD_SERVICE) as InputMethodManager
+            inputMethodManager.hideSoftInputFromWindow(binding.phoneEdit.windowToken, 0)
+        }
+    }
+
+    private fun setErrorMessages(binding: FragmentPersonEditBinding){
+        if (binding.nameEdit.text!!.isEmpty())
+            binding.nameEdit.error = getString(R.string.name_error)
+        if (binding.phoneEdit.text!!.isEmpty())
+            binding.phoneEdit.error = getString(R.string.phone_error)
+        if (binding.dateEdit.text!!.isEmpty())
+            binding.dateEdit.error = getString(R.string.date_error)
+    }
+
+    private fun setNewPhoto(person: PersonBirthday?): String{
+        var filePath = ""
+        var personId: String = UUID.randomUUID().toString()
+        if (person != null)
+            personId = person.personId
+        if (photoUri != null) {
+            filePath = getExternalFilesDirs(
+                (activity as AppCompatActivity),
+                null
+            ).get(0).getAbsolutePath() + "/" + personId
+            try {
+                if (photoUri!!.lastPathSegment != personId.toString()) {
+                    val outFile = File(filePath)
+                    val inputStream: InputStream? =
+                        (activity as AppCompatActivity).getContentResolver()
+                            .openInputStream(photoUri!!)
+                    val os: OutputStream = FileOutputStream(outFile)
+                    val buffer = ByteArray(4096)
+                    while (inputStream!!.read(buffer) != -1) os.write(buffer)
+                    inputStream!!.close()
+                    os.close()
+                    val imagePipeline = Fresco.getImagePipeline()
+                    imagePipeline.evictFromCache(Uri.fromFile(outFile))
+                }
+            } catch (e: Exception) {
+            }
+        } else if (person != null) {
+            val p: String =
+                getExternalFilesDirs(
+                    (activity as AppCompatActivity),
+                    null
+                ).get(0).getAbsolutePath() + "/" + person!!.personId.toString()
+            val file = File(p)
+            if (file.exists()) file.delete()
+        }
+        return filePath
+    }
+
+    private fun setPhoto(){
+        if (photoUri != null) {
+            AlertDialog.Builder(activity as AppCompatActivity)
+                .setTitle(R.string.select_an_action)
+                .setPositiveButton(
+                    R.string.change
+                ) { _: DialogInterface?, _: Int -> selectFile() }
+                .setNegativeButton(
+                    R.string.remove
+                ) { _: DialogInterface?, _: Int ->
+                    val imagePipeline = Fresco.getImagePipeline()
+                    imagePipeline.evictFromCache(photoUri)
+                    photo!!.setImageURI(Uri.EMPTY, null)
+                    photoUri = null
+                }
+                .show()
+        } else selectFile()
+    }
+
+    private fun setFields(person: PersonBirthday, binding: FragmentPersonEditBinding){
+        binding.nameEdit.setText(person!!.name)
+        binding.phoneEdit.setText(person!!.phoneNum)
+        if (person!!.birthdayDate != null) {
+            val date = Date(person!!.birthdayDate!!)
+            val format = SimpleDateFormat("dd.MM.yyyy")
+            binding.dateEdit.setText(format.format(date))
+        }
+        if (person!!.photo != ""){
+            photoUri = Uri.fromFile(File(person!!.photo))
+            photo!!.setImageURI(photoUri, null)
+        }
     }
 
     override fun onOptionsItemSelected(item: MenuItem): Boolean {

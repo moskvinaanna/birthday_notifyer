@@ -1,16 +1,11 @@
 package com.example.birthday_notifyer.peopleedit
 
-import android.app.Person
-import android.util.Log
-import android.view.inputmethod.InputMethodManager
-import androidx.core.content.ContextCompat.getSystemService
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import com.example.birthday_notifyer.database.BirthdayDatabaseDao
 import com.example.birthday_notifyer.database.PersonBirthday
 import kotlinx.coroutines.*
-import java.util.*
 
 class PeopleEditViewModel(
     private val personKey: String = "",

@@ -1,17 +1,13 @@
 package com.example.birthday_notifyer.peopleshow
 
-import android.app.PendingIntent
 import android.content.Intent
 import android.graphics.Color
 import android.net.Uri
-import android.opengl.Visibility
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import androidx.core.content.ContextCompat.startActivity
 import androidx.recyclerview.selection.SelectionTracker
 import androidx.recyclerview.widget.DiffUtil
-import androidx.recyclerview.widget.ListAdapter
 import androidx.recyclerview.widget.RecyclerView
 import com.example.birthday_notifyer.database.PersonBirthday
 import com.example.birthday_notifyer.databinding.ListItemPersonBinding
