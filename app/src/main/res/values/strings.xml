@@ -36,4 +36,5 @@
     <string name="description">Sends notifications</string>
     <string name="birthday">The birthday of </string>
     <string name="congratulate">Congratulate</string>
+    <string name="future_date_error">You\'ve chosen a date from the future</string>
 </resources>

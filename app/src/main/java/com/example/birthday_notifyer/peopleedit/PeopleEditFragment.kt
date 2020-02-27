@@ -163,7 +163,7 @@ class PeopleEditFragment: Fragment() {
             binding.dateEdit.error = getString(R.string.date_error)
         else
             if (Date(cal.timeInMillis).after(Date()))
-                binding.dateEdit.error = "Выбрана дата из будущего"
+                binding.dateEdit.error = getString(R.string.future_date_error)
     }
 
     private fun setNewPhoto(person: PersonBirthday?): String{
