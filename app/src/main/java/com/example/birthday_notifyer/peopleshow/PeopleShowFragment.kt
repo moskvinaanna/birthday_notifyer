@@ -44,6 +44,7 @@ class PeopleShowFragment: Fragment() {
     private var isSortByName: Boolean = true
     private var isSortAsc: Boolean = true
     private var searchText: String = ""
+    private var searchView: SearchView? = null
 
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?,
@@ -54,13 +55,12 @@ class PeopleShowFragment: Fragment() {
         val peopleShowViewModel =
             ViewModelProviders.of(
                 this, viewModelFactory).get(PeopleShowViewModel::class.java)
+        viewModel = peopleShowViewModel
         if (savedInstanceState != null){
             isSortByName = savedInstanceState.getBoolean("isSortByName")
             isSortAsc = savedInstanceState.getBoolean("isSortAsc")
+            searchText = savedInstanceState.getString("searchText")?:""
         }
-
-        viewModel = peopleShowViewModel
-
         val binding: FragmentPeopleListBinding = DataBindingUtil.inflate(
             inflater, R.layout.fragment_people_list, container, false)
         binding.peopleShowViewModel = peopleShowViewModel
@@ -94,6 +94,13 @@ class PeopleShowFragment: Fragment() {
         getDataFromViewModel()
         navigationObservers()
         return binding.root
+    }
+
+    override fun onSaveInstanceState(outState: Bundle) {
+        super.onSaveInstanceState(outState)
+        outState.putString("searchText", searchText)
+        outState.putBoolean("isSortByName", isSortByName)
+        outState.putBoolean("isSortAsc", isSortAsc)
     }
 
     private fun navigationObservers(){
@@ -203,18 +210,22 @@ class PeopleShowFragment: Fragment() {
     override fun onCreateOptionsMenu(menu: Menu, inflater: MenuInflater) {
         inflater.inflate(R.menu.menu_main, menu)
         val item = menu.findItem(R.id.menu_search)
-        val searchView = item.actionView as SearchView
-        searchView.addOnAttachStateChangeListener(object : View.OnAttachStateChangeListener {
+        searchView = item.actionView as SearchView
+        if (searchText != null && searchText.isNotEmpty()) {
+            item.expandActionView()
+            searchView!!.setQuery(searchText, true)
+        }
+        searchView!!.addOnAttachStateChangeListener(object : View.OnAttachStateChangeListener {
             override fun onViewAttachedToWindow(v: View) {}
             override fun onViewDetachedFromWindow(v: View) {
                 menu.findItem(R.id.menu_add).isVisible = true
                 menu.findItem(R.id.menu_sort).isVisible = true
                 getDataFromViewModel()
                 val inputMethodManager = context?.getSystemService(Context.INPUT_METHOD_SERVICE) as InputMethodManager
-                inputMethodManager.hideSoftInputFromWindow(searchView.windowToken, 0)
+                inputMethodManager.hideSoftInputFromWindow(searchView!!.windowToken, 0)
             }
         })
-        searchView.setOnQueryTextListener(object :
+        searchView!!.setOnQueryTextListener(object :
             SearchView.OnQueryTextListener {
             override fun onQueryTextSubmit(query: String): Boolean {
                 return true
