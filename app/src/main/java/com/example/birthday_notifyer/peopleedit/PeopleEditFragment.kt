@@ -2,20 +2,16 @@ package com.example.birthday_notifyer.peopleedit
 
 import android.app.Activity
 import com.google.android.material.datepicker.MaterialDatePicker
-import com.google.android.material.dialog.MaterialAlertDialogBuilder
-import android.app.DatePickerDialog
 import android.content.Context
 import android.content.DialogInterface
 import android.content.Intent
 import android.net.Uri
 import android.os.Bundle
-import android.util.Log
 import android.view.LayoutInflater
 import android.view.MenuItem
 import android.view.View
 import android.view.ViewGroup
 import android.view.inputmethod.InputMethodManager
-import android.widget.DatePicker
 import android.widget.TextView
 import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.app.AppCompatActivity
@@ -32,6 +28,8 @@ import com.example.birthday_notifyer.database.PersonBirthday
 import com.example.birthday_notifyer.databinding.FragmentPersonEditBinding
 import com.facebook.drawee.backends.pipeline.Fresco
 import com.facebook.drawee.view.SimpleDraweeView
+import com.google.android.material.snackbar.BaseTransientBottomBar
+import com.google.android.material.snackbar.Snackbar
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.Job
@@ -183,8 +181,10 @@ class PeopleEditFragment: Fragment() {
         if (binding.dateEdit.text!!.isEmpty())
             binding.dateEdit.error = getString(R.string.date_error)
         else
-            if (Date(cal.timeInMillis).after(Date()))
+            if (Date(cal.timeInMillis).after(Date())) {
                 binding.dateEdit.error = getString(R.string.future_date_error)
+                Snackbar.make(activity!!.findViewById(android.R.id.content), R.string.future_date_error, BaseTransientBottomBar.LENGTH_LONG).show()
+            }
     }
 
     private fun setNewPhoto(person: PersonBirthday?): String{
