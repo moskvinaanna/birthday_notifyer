@@ -211,7 +211,7 @@ class PeopleShowFragment: Fragment() {
         inflater.inflate(R.menu.menu_main, menu)
         val item = menu.findItem(R.id.menu_search)
         searchView = item.actionView as SearchView
-        if (searchText != null && searchText.isNotEmpty()) {
+        if (searchText.isNotEmpty()) {
             item.expandActionView()
             searchView!!.setQuery(searchText, true)
         }

@@ -7,6 +7,7 @@ import android.content.DialogInterface
 import android.content.Intent
 import android.net.Uri
 import android.os.Bundle
+import android.util.Log
 import android.view.LayoutInflater
 import android.view.MenuItem
 import android.view.View
@@ -50,10 +51,16 @@ class PeopleEditFragment: Fragment() {
     private var dateTextView: TextView? = null
     private var cal = Calendar.getInstance()
     private var peopleEditViewModel: PeopleEditViewModel? = null
+    private var binding: FragmentPersonEditBinding? = null
+
+    override fun onCreate(savedInstanceState: Bundle?) {
+        this.retainInstance = true
+        super.onCreate(savedInstanceState)
+    }
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?,
                               savedInstanceState: Bundle?): View? {
-        val binding: FragmentPersonEditBinding = DataBindingUtil.inflate(
+        binding = DataBindingUtil.inflate(
             inflater, R.layout.fragment_person_edit, container, false)
         val application = requireNotNull(this.activity).application
         val arguments = PeopleEditFragmentArgs.fromBundle(arguments!!)
@@ -63,16 +70,17 @@ class PeopleEditFragment: Fragment() {
             ViewModelProviders.of(
                 this, viewModelFactory).get(PeopleEditViewModel::class.java)
         var person: PersonBirthday? = null
-        toolbar = binding.toolbar2
+        toolbar = binding!!.toolbar2
         if(activity is AppCompatActivity){
             (activity as AppCompatActivity).setSupportActionBar(toolbar)
         }
         (activity as AppCompatActivity).supportActionBar?.setDisplayHomeAsUpEnabled(true)
-        photo = binding.photoView
+        photo = binding!!.photoView
         if (arguments.personKey != ""){
                uiScope.launch {
                    person = peopleEditViewModel!!.getPersonFromDataBase()
-                   setFields(person!!, binding)
+                   if (savedInstanceState == null)
+                       setFields(person!!, binding!!)
                }
         }
 
@@ -81,9 +89,9 @@ class PeopleEditFragment: Fragment() {
             photo!!.setImageURI(photoUri, null)
         }
 
-        setClickListeners(binding, person)
+        setClickListeners(binding!!, person)
 
-        binding.peopleEditViewModel = peopleEditViewModel
+        binding!!.peopleEditViewModel = peopleEditViewModel
 
         peopleEditViewModel!!.navigateToPeopleShow.observe(viewLifecycleOwner, Observer {
             if (it == true) {
@@ -92,8 +100,34 @@ class PeopleEditFragment: Fragment() {
                 peopleEditViewModel!!.doneNavigating()
             }
         })
+        if (savedInstanceState != null) {
+            getSavedState(savedInstanceState)
+        }
         setHasOptionsMenu(true)
-        return binding.root
+        return binding!!.root
+    }
+
+    private fun getSavedState(savedInstanceState: Bundle) {
+        binding!!.nameEdit.setText(savedInstanceState.getString("name"))
+        binding!!.phoneEdit.setText(savedInstanceState.getString("phone"))
+        cal.timeInMillis = savedInstanceState.getLong("cal")
+        val format = SimpleDateFormat("dd.MM.yyyy")
+        binding!!.dateEdit.setText(format.format(cal.timeInMillis))
+        val path = savedInstanceState.getString("photo", null)
+        if (path != null) {
+            photoUri = Uri.parse(path)
+            photo!!.setImageURI(photoUri, null)
+        }
+    }
+
+    override fun onSaveInstanceState(outState: Bundle) {
+        outState.putString("name", binding!!.nameEdit!!.text.toString())
+        outState.putString("phone", binding!!.phoneEdit!!.text.toString())
+        outState.putLong("cal", cal.timeInMillis)
+        if (photoUri != null) {
+            outState.putString("photo", photoUri.toString())
+        }
+        super.onSaveInstanceState(outState)
     }
 
     private fun setClickListeners(binding: FragmentPersonEditBinding, person: PersonBirthday?){
@@ -124,7 +158,6 @@ class PeopleEditFragment: Fragment() {
                     cal.get(Calendar.MONTH),
                     cal.get(Calendar.DAY_OF_MONTH)).show()
             }
-
         })
     }
 
