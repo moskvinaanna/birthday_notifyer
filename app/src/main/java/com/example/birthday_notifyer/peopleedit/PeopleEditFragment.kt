@@ -1,6 +1,8 @@
 package com.example.birthday_notifyer.peopleedit
 
 import android.app.Activity
+import com.google.android.material.datepicker.MaterialDatePicker
+import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import android.app.DatePickerDialog
 import android.content.Context
 import android.content.DialogInterface
@@ -52,11 +54,6 @@ class PeopleEditFragment: Fragment() {
     private var cal = Calendar.getInstance()
     private var peopleEditViewModel: PeopleEditViewModel? = null
     private var binding: FragmentPersonEditBinding? = null
-
-    override fun onCreate(savedInstanceState: Bundle?) {
-        this.retainInstance = true
-        super.onCreate(savedInstanceState)
-    }
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?,
                               savedInstanceState: Bundle?): View? {
@@ -139,26 +136,15 @@ class PeopleEditFragment: Fragment() {
             onSave(binding, person)
         }
 
-        val dateSetListener = object : DatePickerDialog.OnDateSetListener {
-            override fun onDateSet(view: DatePicker, year: Int, monthOfYear: Int,
-                                   dayOfMonth: Int) {
-                cal.set(Calendar.YEAR, year)
-                cal.set(Calendar.MONTH, monthOfYear)
-                cal.set(Calendar.DAY_OF_MONTH, dayOfMonth)
+        binding.dateEdit.setOnClickListener {
+            val datePicker = MaterialDatePicker.Builder.datePicker()
+                .setSelection(cal.timeInMillis)
+                .build()
+            datePicker.addOnPositiveButtonClickListener {
                 updateDateInView()
             }
+            datePicker.show(activity!!.supportFragmentManager, "datePicker")
         }
-        dateTextView = binding.dateEdit
-
-        dateTextView!!.setOnClickListener(object : View.OnClickListener {
-            override fun onClick(view: View) {
-                DatePickerDialog(activity as AppCompatActivity,
-                    dateSetListener,
-                    cal.get(Calendar.YEAR),
-                    cal.get(Calendar.MONTH),
-                    cal.get(Calendar.DAY_OF_MONTH)).show()
-            }
-        })
     }
 
     private fun onSave(binding: FragmentPersonEditBinding, person: PersonBirthday?){
