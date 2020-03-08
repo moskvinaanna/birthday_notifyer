@@ -59,6 +59,7 @@ class PeopleEditFragment: Fragment() {
                               savedInstanceState: Bundle?): View? {
         binding = DataBindingUtil.inflate(
             inflater, R.layout.fragment_person_edit, container, false)
+        dateTextView = binding!!.dateEdit
         val application = requireNotNull(this.activity).application
         val arguments = PeopleEditFragmentArgs.fromBundle(arguments!!)
         val dataSource = BirthdayDatabase.getInstance(application).birthdayDatabaseDao
@@ -141,6 +142,7 @@ class PeopleEditFragment: Fragment() {
                 .setSelection(cal.timeInMillis)
                 .build()
             datePicker.addOnPositiveButtonClickListener {
+                cal.timeInMillis = it
                 updateDateInView()
             }
             datePicker.show(activity!!.supportFragmentManager, "datePicker")
@@ -268,7 +270,7 @@ class PeopleEditFragment: Fragment() {
     private fun updateDateInView() {
         val myFormat = "dd.MM.yyyy"
         val sdf = SimpleDateFormat(myFormat, Locale.US)
-        dateTextView!!.text = sdf.format(cal.getTime())
+        dateTextView!!.text = sdf.format(cal.timeInMillis)
     }
 
     override fun onActivityResult(
