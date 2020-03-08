@@ -28,7 +28,11 @@ class PeopleEditViewModel(
     fun onSave(id: String, name: String, phoneNum: String, date: Long?, photo: String) {
         uiScope.launch {
             if (personKey == "") {
-                val person = PersonBirthday(personId = id, name = name, phoneNum = phoneNum, birthdayDate = date, photo = photo)
+                val person = PersonBirthday(personId = id,
+                    name = name,
+                    phoneNum = phoneNum,
+                    birthdayDate = date,
+                    photo = photo)
                 insert(person)
             }
             else {

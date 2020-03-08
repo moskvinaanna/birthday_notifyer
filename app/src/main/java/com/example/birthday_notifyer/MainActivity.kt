@@ -21,7 +21,8 @@ class MainActivity : AppCompatActivity() {
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
             val channel = NotificationChannel(
                 applicationContext.getString(R.string.channel),
-                applicationContext.getString(R.string.app_name), NotificationManager.IMPORTANCE_DEFAULT
+                applicationContext.getString(R.string.app_name),
+                NotificationManager.IMPORTANCE_DEFAULT
             )
             channel.description = applicationContext.getString(R.string.description)
             val notificationManager =

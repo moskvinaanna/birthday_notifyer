@@ -148,7 +148,10 @@ class PeopleEditFragment: Fragment() {
     }
 
     private fun onSave(binding: FragmentPersonEditBinding, person: PersonBirthday?){
-        if (binding.nameEdit.text!!.isEmpty() || binding.phoneEdit.text!!.isEmpty() || binding.dateEdit.text!!.isEmpty() || Date(cal.timeInMillis).after(Date())) {
+        if (binding.nameEdit.text!!.isEmpty() ||
+            binding.phoneEdit.text!!.isEmpty() ||
+            binding.dateEdit.text!!.isEmpty() ||
+            Date(cal.timeInMillis).after(Date())) {
             setErrorMessages(binding)
         }
         else {
@@ -183,7 +186,9 @@ class PeopleEditFragment: Fragment() {
         else
             if (Date(cal.timeInMillis).after(Date())) {
                 binding.dateEdit.error = getString(R.string.future_date_error)
-                Snackbar.make(activity!!.findViewById(android.R.id.content), R.string.future_date_error, BaseTransientBottomBar.LENGTH_LONG).show()
+                Snackbar.make(activity!!.findViewById(android.R.id.content),
+                    R.string.future_date_error,
+                    BaseTransientBottomBar.LENGTH_LONG).show()
             }
     }
 

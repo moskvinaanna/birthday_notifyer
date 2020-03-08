@@ -95,7 +95,8 @@ class PeopleShowAdapter(val clickListener: PersonBirthdayListener) : RecyclerVie
                 val day = curDate[Calendar.DAY_OF_MONTH]
                 val month = curDate[Calendar.MONTH]
                 personBirthdayDate.timeInMillis = item.birthdayDate!!
-                if (day == personBirthdayDate.get(Calendar.DAY_OF_MONTH) && month == personBirthdayDate.get(Calendar.MONTH)){
+                if (day == personBirthdayDate.get(Calendar.DAY_OF_MONTH)
+                    && month == personBirthdayDate.get(Calendar.MONTH)){
                     binding.imageButton.visibility = View.VISIBLE
                 }
             }

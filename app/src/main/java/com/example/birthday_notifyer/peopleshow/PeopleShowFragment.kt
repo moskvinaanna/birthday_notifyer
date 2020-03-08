@@ -221,7 +221,8 @@ class PeopleShowFragment: Fragment() {
                 menu.findItem(R.id.menu_add).isVisible = true
                 menu.findItem(R.id.menu_sort).isVisible = true
                 getDataFromViewModel()
-                val inputMethodManager = context?.getSystemService(Context.INPUT_METHOD_SERVICE) as InputMethodManager
+                val inputMethodManager =
+                    context?.getSystemService(Context.INPUT_METHOD_SERVICE) as InputMethodManager
                 inputMethodManager.hideSoftInputFromWindow(searchView!!.windowToken, 0)
             }
         })
