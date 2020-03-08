@@ -73,7 +73,6 @@ class NotificationWorker(
     }
 
     private fun createNotif(pendingIntent: PendingIntent, person:PersonBirthday): Notification {
-
         return NotificationCompat.Builder(
             applicationContext,
             applicationContext.getString(R.string.channel)

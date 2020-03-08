@@ -31,18 +31,6 @@ class PeopleShowViewModel (
         }
     }
 
-    private suspend fun update(person: PersonBirthday) {
-        withContext(Dispatchers.IO) {
-            database.update(person)
-        }
-    }
-
-    private suspend fun clear() {
-        withContext(Dispatchers.IO) {
-            database.clear()
-        }
-    }
-
     fun onAdd(){
         uiScope.launch {
             _navigateToPeopleEdit.value = ""

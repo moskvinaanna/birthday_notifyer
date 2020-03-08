@@ -52,28 +52,37 @@ class PeopleShowFragment: Fragment() {
         val application = requireNotNull(this.activity).application
         val dataSource = BirthdayDatabase.getInstance(application).birthdayDatabaseDao
         val viewModelFactory = PeopleShowViewModelFactory(dataSource, application)
-        val peopleShowViewModel =
-            ViewModelProviders.of(
+        viewModel = ViewModelProviders.of(
                 this, viewModelFactory).get(PeopleShowViewModel::class.java)
-        viewModel = peopleShowViewModel
-        if (savedInstanceState != null){
-            isSortByName = savedInstanceState.getBoolean("isSortByName")
-            isSortAsc = savedInstanceState.getBoolean("isSortAsc")
-            searchText = savedInstanceState.getString("searchText")?:""
-        }
+        getSavedState(savedInstanceState)
         val binding: FragmentPeopleListBinding = DataBindingUtil.inflate(
             inflater, R.layout.fragment_people_list, container, false)
-        binding.peopleShowViewModel = peopleShowViewModel
+        binding.peopleShowViewModel = viewModel
         val manager = LinearLayoutManager(activity)
         binding.peopleList.layoutManager = manager
+        setupMenu(binding)
+        setupAdapter()
+        setupTracker(binding)
+        getDataFromViewModel()
+        navigationObservers()
+        return binding.root
+    }
+
+    private fun setupAdapter(){
+        adapter = PeopleShowAdapter(PersonBirthdayListener { personId ->
+            viewModel!!.onPersonCardClicked(personId)
+        })
+    }
+
+    private fun setupMenu(binding: FragmentPeopleListBinding){
         toolbar = binding.toolbar
         if(activity is AppCompatActivity){
             (activity as AppCompatActivity).setSupportActionBar(toolbar)
         }
         setHasOptionsMenu(true)
-        adapter = PeopleShowAdapter(PersonBirthdayListener { personId ->
-            peopleShowViewModel.onPersonCardClicked(personId)
-        })
+    }
+
+    private fun setupTracker(binding: FragmentPeopleListBinding){
         recyclerView = binding.peopleList
         recyclerView!!.adapter = adapter
         tracker = SelectionTracker.Builder(
@@ -91,9 +100,14 @@ class PeopleShowFragment: Fragment() {
                 toggleActionMode()
             }
         })
-        getDataFromViewModel()
-        navigationObservers()
-        return binding.root
+    }
+
+    private fun getSavedState(savedInstanceState: Bundle?){
+        if (savedInstanceState != null){
+            isSortByName = savedInstanceState.getBoolean("isSortByName")
+            isSortAsc = savedInstanceState.getBoolean("isSortAsc")
+            searchText = savedInstanceState.getString("searchText")?:""
+        }
     }
 
     override fun onSaveInstanceState(outState: Bundle) {
@@ -166,27 +180,25 @@ class PeopleShowFragment: Fragment() {
     private fun popUpClick(menuItem: MenuItem): Boolean{
         when (menuItem.itemId){
             R.id.sort_by_date_asc -> {
-                isSortAsc = true
-                isSortByName = true
-                getDataFromViewModel()
+                sort(true, true)
             }
             R.id.sort_by_date_desc -> {
-                isSortAsc = false
-                isSortByName = true
-                getDataFromViewModel()
+                sort(true, false)
             }
             R.id.sort_by_name_asc -> {
-                isSortAsc = true
-                isSortByName = false
-                getDataFromViewModel()
+                sort(false, true)
             }
             R.id.sort_by_name_desc -> {
-                isSortAsc = false
-                isSortByName = false
-                getDataFromViewModel()
+                sort(false, false)
             }
         }
         return true
+    }
+
+    private fun sort(byName: Boolean, asc: Boolean){
+        isSortAsc = asc
+        isSortByName = byName
+        getDataFromViewModel()
     }
 
     fun getDataFromViewModel(){
@@ -195,9 +207,9 @@ class PeopleShowFragment: Fragment() {
         if (isSortByName && !isSortAsc)
             viewModel!!.onSortByNameDesc(searchText)
         if (!isSortByName && isSortAsc)
-            viewModel!!.onSortByNameAsc(searchText)
+            viewModel!!.onSortByDateAsc(searchText)
         if (!isSortByName && !isSortAsc)
-            viewModel!!.onSortByNameDesc(searchText)
+            viewModel!!.onSortByDateDesc(searchText)
         recyclerView!!.smoothScrollToPosition(0)
         viewModel!!.people.observe(viewLifecycleOwner, Observer {
             it?.let {
@@ -215,17 +227,12 @@ class PeopleShowFragment: Fragment() {
             item.expandActionView()
             searchView!!.setQuery(searchText, true)
         }
-        searchView!!.addOnAttachStateChangeListener(object : View.OnAttachStateChangeListener {
-            override fun onViewAttachedToWindow(v: View) {}
-            override fun onViewDetachedFromWindow(v: View) {
-                menu.findItem(R.id.menu_add).isVisible = true
-                menu.findItem(R.id.menu_sort).isVisible = true
-                getDataFromViewModel()
-                val inputMethodManager =
-                    context?.getSystemService(Context.INPUT_METHOD_SERVICE) as InputMethodManager
-                inputMethodManager.hideSoftInputFromWindow(searchView!!.windowToken, 0)
-            }
-        })
+        searchViewAttachListener(menu)
+        queryTextChangeListener()
+        super.onCreateOptionsMenu(menu, inflater)
+    }
+
+    private fun queryTextChangeListener(){
         searchView!!.setOnQueryTextListener(object :
             SearchView.OnQueryTextListener {
             override fun onQueryTextSubmit(query: String): Boolean {
@@ -240,43 +247,57 @@ class PeopleShowFragment: Fragment() {
                 return true
             }
         })
-        super.onCreateOptionsMenu(menu, inflater)
+    }
+
+    private fun searchViewAttachListener(menu: Menu){
+        searchView!!.addOnAttachStateChangeListener(object : View.OnAttachStateChangeListener {
+            override fun onViewAttachedToWindow(v: View) {}
+            override fun onViewDetachedFromWindow(v: View) {
+                menu.findItem(R.id.menu_add).isVisible = true
+                menu.findItem(R.id.menu_sort).isVisible = true
+                getDataFromViewModel()
+                val inputMethodManager =
+                    context?.getSystemService(Context.INPUT_METHOD_SERVICE) as InputMethodManager
+                inputMethodManager.hideSoftInputFromWindow(searchView!!.windowToken, 0)
+            }
+        })
     }
 
     override fun onOptionsItemSelected(item: MenuItem): Boolean {
         val menu = toolbar!!.menu
         when (item.itemId) {
-            R.id.menu_add -> {
-                if (activity is AppCompatActivity){
-                    val popupMenu = PopupMenu((activity as AppCompatActivity),
-                        (activity as AppCompatActivity).findViewById(item.getItemId()))
-                    popupMenu.inflate(R.menu.popup_menu_add)
-                    popupMenu.setOnMenuItemClickListener{ it
-                        popUpClickAdd(it)
-                    }
-                    popupMenu.show()
-                }
-            }
-               // viewModel?.onAdd() }
+            R.id.menu_add -> menuAdd(item, menu)
             R.id.menu_search -> {
                 menu.findItem(R.id.menu_add).isVisible = false
                 menu.findItem(R.id.menu_sort).isVisible = false
             }
-            R.id.menu_sort ->{
-                if (activity is AppCompatActivity){
-                    val popupMenu = PopupMenu((activity as AppCompatActivity),
-                        (activity as AppCompatActivity).findViewById(item.getItemId()))
-                    popupMenu.inflate(R.menu.popup_menu)
-                    popupMenu.setOnMenuItemClickListener{ it
-                        popUpClick(it)
-                    }
-                    popupMenu.show()
-                }
-
-
-            }
+            R.id.menu_sort -> menuSort(item)
         }
         return super.onOptionsItemSelected(item)
+    }
+
+    private fun menuSort(item: MenuItem){
+        if (activity is AppCompatActivity){
+            val popupMenu = PopupMenu((activity as AppCompatActivity),
+                (activity as AppCompatActivity).findViewById(item.getItemId()))
+            popupMenu.inflate(R.menu.popup_menu)
+            popupMenu.setOnMenuItemClickListener{ it
+                popUpClick(it)
+            }
+            popupMenu.show()
+        }
+    }
+
+    private fun menuAdd(item: MenuItem, menu: Menu){
+        if (activity is AppCompatActivity){
+            val popupMenu = PopupMenu((activity as AppCompatActivity),
+                (activity as AppCompatActivity).findViewById(item.getItemId()))
+            popupMenu.inflate(R.menu.popup_menu_add)
+            popupMenu.setOnMenuItemClickListener{ it
+                popUpClickAdd(it)
+            }
+            popupMenu.show()
+        }
     }
 
     private fun addFromContacts(){
@@ -309,32 +330,40 @@ class PeopleShowFragment: Fragment() {
         if (selectionSize > 0 && actionMode == null) {
             actionMode = (activity as AppCompatActivity).startSupportActionMode(callback)
             if (actionMode != null) {
-                val edit = actionMode!!.menu.findItem(R.id.menu_edit)
-                edit.setEnabled(selectionSize == 1)
-                if (selectionSize == 1)
-                    edit.icon.colorFilter = PorterDuffColorFilter(Color.WHITE, PorterDuff.Mode.SRC_IN)
-                else
-                    edit.icon.colorFilter = PorterDuffColorFilter(Color.GRAY, PorterDuff.Mode.SRC_IN)
+                startActionMode(selectionSize)
             }
         } else if (actionMode != null) {
             if (selectionSize > 0) {
-                val edit = actionMode!!.menu.findItem(R.id.menu_edit)
-                edit.setEnabled(selectionSize == 1)
-                if (selectionSize == 1)
-                    edit.icon.colorFilter = PorterDuffColorFilter(Color.WHITE, PorterDuff.Mode.SRC_IN)
-                else
-                    edit.icon.colorFilter = PorterDuffColorFilter(Color.GRAY, PorterDuff.Mode.SRC_IN)
-                actionMode!!.getMenu().findItem(R.id.menu_count).setTitle(
-                    String.format(
-                        Locale.US,
-                        "%d/%d",
-                        selectionSize,
-                        adapter!!.itemCount
-                    )
-                )
+                continueSelection(selectionSize)
             } else
                 actionMode!!.finish()
         }
+    }
+
+    private fun continueSelection(selectionSize: Int){
+        val edit = actionMode!!.menu.findItem(R.id.menu_edit)
+        edit.setEnabled(selectionSize == 1)
+        if (selectionSize == 1)
+            edit.icon.colorFilter = PorterDuffColorFilter(Color.WHITE, PorterDuff.Mode.SRC_IN)
+        else
+            edit.icon.colorFilter = PorterDuffColorFilter(Color.GRAY, PorterDuff.Mode.SRC_IN)
+        actionMode!!.getMenu().findItem(R.id.menu_count).setTitle(
+            String.format(
+                Locale.US,
+                "%d/%d",
+                selectionSize,
+                adapter!!.itemCount
+            )
+        )
+    }
+
+    private fun startActionMode(selectionSize: Int){
+        val edit = actionMode!!.menu.findItem(R.id.menu_edit)
+        edit.setEnabled(selectionSize == 1)
+        if (selectionSize == 1)
+            edit.icon.colorFilter = PorterDuffColorFilter(Color.WHITE, PorterDuff.Mode.SRC_IN)
+        else
+            edit.icon.colorFilter = PorterDuffColorFilter(Color.GRAY, PorterDuff.Mode.SRC_IN)
     }
 
     private val callback = object : ActionMode.Callback {
@@ -357,38 +386,42 @@ class PeopleShowFragment: Fragment() {
 
         override fun onActionItemClicked(mode: ActionMode, item: MenuItem): Boolean {
             when (item.itemId) {
-                R.id.menu_select_all -> {
-                    if (tracker!!.selection.size() != adapter!!.itemCount){
-                        val ids = ArrayList<String>()
-                        for (person in adapter!!.getAllPeople())
-                            ids.add(person.personId)
-                        tracker!!.setItemsSelected(ids, true)
-                    }
-                    else  {
-                        mode.finish()
-                    }
-                }
+                R.id.menu_select_all -> selectAll(mode)
                 R.id.menu_edit -> {
                     val id = tracker!!.getSelection().iterator().next()
                     viewModel!!.onPersonClicked(id)
                 }
-                R.id.menu_remove -> {
-                    val ids = ArrayList<String>()
-                    for (person in adapter!!.getAllPeople()) {
-                        if (tracker!!.selection.contains(person.personId)) {
-                            ids.add(person.personId)
-                            if (person.photo != "") {
-                                val photo = File(person.photo)
-                                photo.delete()
-                            }
-                        }
-                    }
-
-                    mode.finish()
-                    viewModel!!.onRemove(ids)
-                }
+                R.id.menu_remove -> remove(mode)
             }
             return true
+        }
+
+        private fun remove(mode: ActionMode){
+            val ids = ArrayList<String>()
+            for (person in adapter!!.getAllPeople()) {
+                if (tracker!!.selection.contains(person.personId)) {
+                    ids.add(person.personId)
+                    if (person.photo != "") {
+                        val photo = File(person.photo)
+                        photo.delete()
+                    }
+                }
+            }
+
+            mode.finish()
+            viewModel!!.onRemove(ids)
+        }
+
+        private fun selectAll(mode: ActionMode){
+            if (tracker!!.selection.size() != adapter!!.itemCount){
+                val ids = ArrayList<String>()
+                for (person in adapter!!.getAllPeople())
+                    ids.add(person.personId)
+                tracker!!.setItemsSelected(ids, true)
+            }
+            else  {
+                mode.finish()
+            }
         }
 
         override fun onDestroyActionMode(mode: ActionMode) {

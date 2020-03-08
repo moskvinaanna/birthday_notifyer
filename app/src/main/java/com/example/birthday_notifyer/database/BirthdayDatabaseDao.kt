@@ -26,9 +26,9 @@ interface BirthdayDatabaseDao {
     fun getAllPeopleByNameAsc(name: String): LiveData<List<PersonBirthday>>
     @Query("SELECT * FROM person_birthday_table WHERE name LIKE :name ORDER BY name DESC")
     fun getAllPeopleByNameDesc(name: String): LiveData<List<PersonBirthday>>
-    @Query("SELECT * FROM person_birthday_table WHERE name LIKE :name ORDER BY birthday_date ASC")
-    fun getAllPeopleByDateAsc(name: String): LiveData<List<PersonBirthday>>
     @Query("SELECT * FROM person_birthday_table WHERE name LIKE :name ORDER BY birthday_date DESC")
+    fun getAllPeopleByDateAsc(name: String): LiveData<List<PersonBirthday>>
+    @Query("SELECT * FROM person_birthday_table WHERE name LIKE :name ORDER BY birthday_date ASC")
     fun getAllPeopleByDateDesc(name: String): LiveData<List<PersonBirthday>>
     @Query("SELECT * FROM person_birthday_table WHERE name LIKE :name")
     fun searchPeople(name: String): LiveData<List<PersonBirthday>>

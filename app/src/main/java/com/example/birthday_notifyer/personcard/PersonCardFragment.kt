@@ -36,27 +36,28 @@ class PersonCardFragment: Fragment() {
     private var photoUri: Uri? = null
     private var photo: SimpleDraweeView? = null
     private var personCardViewModel: PeopleEditViewModel? = null
+    private var person: PersonBirthday? = null
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?,
                               savedInstanceState: Bundle?): View? {
 
         val binding: FragmentPersonCardBinding = DataBindingUtil.inflate(
             inflater, R.layout.fragment_person_card, container, false)
-
         val application = requireNotNull(this.activity).application
         val arguments = PeopleEditFragmentArgs.fromBundle(arguments!!)
 
         val dataSource = BirthdayDatabase.getInstance(application).birthdayDatabaseDao
         val viewModelFactory = PeopleEditViewModelFactory(arguments.personKey, dataSource)
-
         personCardViewModel =
             ViewModelProviders.of(
                 this, viewModelFactory).get(PeopleEditViewModel::class.java)
-        var person: PersonBirthday? = null
+        populateFragment(binding)
+        return binding.root
+    }
+
+    private fun populateFragment(binding: FragmentPersonCardBinding){
         toolbar = binding.toolbar2
-        if(activity is AppCompatActivity){
-            (activity as AppCompatActivity).setSupportActionBar(toolbar)
-        }
+        (activity as AppCompatActivity).setSupportActionBar(toolbar)
         (activity as AppCompatActivity).supportActionBar?.setDisplayHomeAsUpEnabled(true)
         photo = binding.photo
         uiScope.launch {
@@ -68,9 +69,7 @@ class PersonCardFragment: Fragment() {
             photoUri = Uri.parse(person!!.photo)
             photo!!.setImageURI(photoUri, null)
         }
-
         setHasOptionsMenu(true)
-        return binding.root
     }
 
     private fun setLabels(person: PersonBirthday, binding: FragmentPersonCardBinding){

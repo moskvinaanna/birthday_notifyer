@@ -73,22 +73,41 @@ class PeopleShowAdapter(val clickListener: PersonBirthdayListener) : RecyclerVie
         private var personItemDetail: PersonItemDetail? = null
 
         fun bind(pos: Int, item: PersonBirthday, clickListener: PersonBirthdayListener) {
-            val photoView: SimpleDraweeView = binding.photo
             binding.person = item
-            if (item.photo != "")
-                photoView.setImageURI(Uri.fromFile(File(item.photo)), null)
-            else
-                photoView.setImageURI(Uri.EMPTY, null)
+            setupImage(item)
+            setupCard()
+            setupButton(item)
+            displayButton(item)
+            binding.clickListener = clickListener
+            binding.executePendingBindings()
+            personItemDetail = PersonItemDetail(pos, item.personId)
+        }
+
+        private fun setupCard(){
             if (binding.cardView.isActivated)
                 binding.cardView.setBackgroundColor(Color.LTGRAY)
             else
                 binding.cardView.setBackgroundColor(Color.WHITE)
+        }
+
+        private fun setupButton(item: PersonBirthday){
             binding.imageButton.visibility = View.GONE
             binding.imageButton.setOnClickListener{
                 val intent = Intent(Intent.ACTION_DIAL)
                 intent.data = Uri.parse("tel:" + item.phoneNum)
                 it.context.startActivity(intent)
             }
+        }
+
+        private fun setupImage(item: PersonBirthday){
+            val photoView: SimpleDraweeView = binding.photo
+            if (item.photo != "")
+                photoView.setImageURI(Uri.fromFile(File(item.photo)), null)
+            else
+                photoView.setImageURI(Uri.EMPTY, null)
+        }
+
+        private fun displayButton(item: PersonBirthday){
             if (item.birthdayDate != null) {
                 val curDate: Calendar = Calendar.getInstance()
                 val personBirthdayDate: Calendar = Calendar.getInstance()
@@ -100,9 +119,6 @@ class PeopleShowAdapter(val clickListener: PersonBirthdayListener) : RecyclerVie
                     binding.imageButton.visibility = View.VISIBLE
                 }
             }
-            binding.clickListener = clickListener
-            binding.executePendingBindings()
-            personItemDetail = PersonItemDetail(pos, item.personId)
         }
 
         fun getPersonDetails(): PersonItemDetail{
